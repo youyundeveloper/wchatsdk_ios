@@ -14,9 +14,9 @@
 @interface WChatSDK : NSObject
 
 @property (nonatomic, assign) id<WChatSDKDelegate> delegate;    //delegate
-@property (nonatomic, strong) NSString *userId;                 //用户id
-@property (nonatomic, assign) BOOL     isRunning;               //是否登陆成功
-@property (nonatomic, readonly) NSString         *cachePath;    //sdk使用的cacahe路径
+@property (nonatomic, strong) NSString             *userId;     //用户id
+@property (nonatomic, assign) BOOL                 isRunning;   //是否登陆成功
+@property (nonatomic, readonly) NSString           *cachePath;  //sdk使用的cacahe路径
 
 #pragma mark - 初始化单例
 
@@ -43,7 +43,7 @@
  */
 -(void)registerApp:(NSString *)appUDID
           clientId:(NSString *)clientId
-            secret:(NSString*)secret
+            secret:(NSString *)secret
           delegate:(id<WChatSDKDelegate>)clientDelegate;
 
 /**
@@ -56,7 +56,7 @@
  */
 -(void)testRegisterApp:(NSString *)appUDID
               clientId:(NSString *)clientId
-                secret:(NSString*)secret
+                secret:(NSString *)secret
               delegate:(id<WChatSDKDelegate>)clientDelegate;
 
 
@@ -132,7 +132,7 @@
  */
 - (BOOL)wchatLogin:(NSString *)username
           password:(NSString *)password
-      onBackGround:(BOOL)isOnBackRround
+      onBackGround:(BOOL)isOnBackground
        withTimeout:(NSTimeInterval)timeout
              error:(NSError **)errPtr;
 
@@ -149,7 +149,7 @@
  */
 - (BOOL)wchatLoginWithToken:(NSString *)token
                refreshToken:(NSString *)refreshToken
-               onBackGround:(BOOL)isOnBackRround
+               onBackGround:(BOOL)isOnBackground
                 withTimeout:(NSTimeInterval)timeout
                       error:(NSError **)errPtr;
 
@@ -198,93 +198,72 @@
 /**
  *  @brief 发送文本消息
  *
- *  @param tuid       收消息人Uid
+ *  @param toid       收消息人、群组、聊天室id
  *  @param content    消息内容
  *  @param extContent 扩展消息内容
  *  @param tag        消息标示, 用于回调
  *  @param type       消息类型
+ *  @param target     消息对象类型
  *  @param timeout    调用超时时间
  *  @param errPtr     错误句柄
  *
  *  @return 消息是否正常发送, YES是, NO否
  */
-- (BOOL)wchatSendMsg:(NSString *)tuid
+- (BOOL)wchatSendMsg:(NSString *)toid
                 body:(NSData *)content
              extBody:(NSData *)extContent
              withTag:(NSInteger)tag
-            withType:(WChatFileType)type
+            withType:(YYWChatFileType)type
+          targetType:(WChatMsgTargetType)target
          withTimeout:(NSTimeInterval)timeout
                error:(NSError **)errPtr;
 
+#pragma mark - 发送自定义(富文本)消息
 /**
- *  @brief 发送群组文本消息
+ *  @brief 发送自定义(富文本)消息
  *
- *  @param gid        收消息群组Gid
+ *  @param toid       收消息人、群组、聊天室id
  *  @param content    消息内容
  *  @param extContent 扩展消息内容
  *  @param tag        消息标示, 用于回调
- *  @param type       消息类型
+ *  @param type       发送对象类型
  *  @param timeout    调用超时时间
- *  @param errPtr     错误句柄
- *
- *  @return 消息是否正常发送, YES是, NO否
+ *  @param errPrt     错误句柄
  */
-- (BOOL)wchatSendGroupMsg:(NSString *)gid
+- (void)wchatSendMixedMsg:(NSString *)toid
                      body:(NSData *)content
                   extBody:(NSData *)extContent
-                  withTag:(NSInteger)tag
-                 withType:(WChatFileType)type
-              withTimeout:(NSTimeInterval)timeout
-                    error:(NSError **)errPtr;
+                      tag:(NSInteger)tag
+                     type:(WChatMsgTargetType)type
+                  timeout:(NSTimeInterval)timeout
+                    error:(NSError **)errPrt;
 
 #pragma mark - 发送语音消息接口
 
 /**
  *  @brief 发送音频消息
  *
- *  @param tuid       收消息人Uid
+ *  @param toid       收消息人、群组、聊天室id
  *  @param spanId     语音唯一标示
  *  @param sequenceNo 语音分片编号, 如 1, 2, 3, ... -1, -1 表示结束
  *  @param content    语音消息内容
  *  @param ext        扩展消息内容
  *  @param tag        消息标示, 用于回调
+ *  @param target     消息对象类型
  *  @param timeout    调用超时时间
  *  @param errPtr     错误句柄
  *
  *  @return 消息是否正常发送, YES是, NO否
  */
-- (BOOL)wchatSendVoice:(NSString *)tuid
+- (BOOL)wchatSendVoice:(NSString *)toid
                 spanId:(NSString *)spanId
             sequenceNo:(NSInteger)sequenceNo
                content:(NSData *)content
                    ext:(NSData *)ext
                withTag:(NSInteger)tag
+            targetType:(WChatMsgTargetType)target
            withTimeout:(NSTimeInterval)timeout
                  error:(NSError **)errPtr;
-
-/**
- *  @brief 发送群组音频消息
- *
- *  @param gid        收消息群组Gid
- *  @param spanId     语音唯一标示
- *  @param sequenceNo 语音分片编号, 如 1, 2, 3, ... -1, -1 表示结束
- *  @param content    语音消息内容
- *  @param ext        扩展消息内容
- *  @param tag        消息标示, 用于回调
- *  @param timeout    调用超时时间
- *  @param errPtr     错误句柄
- *
- *  @return 消息是否正常发送, YES是, NO否
- */
-- (BOOL)wchatSendGroupVoice:(NSString *)gid
-                     spanId:(NSString *)spanId
-                 sequenceNo:(NSInteger)sequenceNo
-                    content:(NSData *)content
-                        ext:(NSData *)ext
-                    withTag:(NSInteger)tag
-                withTimeout:(NSTimeInterval)timeout
-                      error:(NSError **)errPtr;
-
 
 /**
  *  @brief 获取语音唯一标示
@@ -297,92 +276,108 @@
 
 #pragma mark - 发送文件消息接口
 /**
- *  @brief 发送文件给个人
+ *  @brief 发送文件给个人、群组
  *
- *  @param tuid       收消息人Uid
+ *  @param toid       收消息人、群组、聊天室id
  *  @param filepath   文件路径
  *  @param extContent 扩展消息内容
  *  @param tag        消息标示, 用于回调
  *  @param fileType   文件类型
+ *  @param target     消息对象类型
  *  @param timeout    调用超时时间
  *  @param errPtr     错误句柄
  *
  *  @return 文件id
  */
-- (NSString *)wchatSendFile:(NSString *)tuid
+- (NSString *)wchatSendFile:(NSString *)toid
                        path:(NSString *)filepath
                     extBody:(NSData *)extContent
                     withTag:(NSInteger)tag
-                   filetype:(WChatFileType)fileType
+                   filetype:(YYWChatFileType)fileType
+                 targetType:(WChatMsgTargetType)target
                 withTimeout:(NSTimeInterval)timeout
                       error:(NSError **)errPtr;
 
 /**
- *  @brief 发送文件给群组
+ *	@brief 发送文件给个人、群组, 断点续传
  *
- *  @param gid        收消息群组Gid
+ *  @param toid       收消息人、群组、聊天室id
+ *  @param fid        文件id
  *  @param filepath   文件路径
  *  @param extContent 扩展消息内容
+ *  @param index      文件片数索引
  *  @param tag        消息标示, 用于回调
  *  @param fileType   文件类型
+ *  @param target     消息对象类型
  *  @param timeout    调用超时时间
  *  @param errPtr     错误句柄
  *
  *  @return 文件id
  */
-- (NSString *)wchatSendGroupFile:(NSString *)gid
-                            path:(NSString *)filepath
-                         extBody:(NSData *)extContent
-                         withTag:(NSInteger)tag
-                        filetype:(WChatFileType)fileType
-                     withTimeout:(NSTimeInterval)timeout
-                           error:(NSError **)errPtr;
+- (NSString *)wchatSendFile:(NSString *)toid
+                    withFid:(NSString *)fid
+                       path:(NSString *)filename
+                    extBody:(NSData *)extContent
+                  withIndex:(UInt32)index
+                    withTag:(NSInteger)tag
+                   filetype:(YYWChatFileType)fileType
+                 targetType:(WChatMsgTargetType)target
+                withTimeout:(NSTimeInterval)timeout
+                      error:(NSError **)errPtr;
 
 /**
- *  @brief 发送文件给个人, 带缩略图
+ *  @brief 发送文件(图片)给个人、群组, 带缩略图
  *
- *  @param tuid       收消息人Uid
+ *  @param toid       收消息人、群组、聊天室id
  *  @param filepath   文件路径
  *  @param nailpath   缩略图路径
  *  @param extContent 扩展消息内容
  *  @param tag        消息标示, 用于回调
  *  @param fileType   文件类型
+ *  @param target     消息对象类型
  *  @param timeout    调用超时时间
  *  @param errPtr     错误句柄
  *
  *  @return 文件id
  */
-- (NSString *)wchatSendFileWithThumbnail:(NSString *)tuid
+- (NSString *)wchatSendFileWithThumbnail:(NSString *)toid
                                     path:(NSString *)filepath
                                 nailpath:(NSString *)nailpath
                                  extBody:(NSData *)extContent
                                  withTag:(NSInteger)tag
-                                filetype:(WChatFileType)fileType
+                                filetype:(YYWChatFileType)fileType
+                              targetType:(WChatMsgTargetType)target
                              withTimeout:(NSTimeInterval)timeout
                                    error:(NSError **)errPtr;
-
 /**
- *	@brief 发送文件给群组, 带缩略图
+ *	@brief 发送文件给个人、群组, 带缩略图, 断点续传
  *
- *  @param gid        收消息群组Gid
+ *  @param toid       收消息人、群组、聊天室id
+ *  @param fid        文件id
  *  @param filepath   文件路径
  *  @param nailpath   缩略图路径
  *  @param extContent 扩展消息内容
+ *  @param index      文件片数索引
  *  @param tag        消息标示, 用于回调
  *  @param fileType   文件类型
+ *  @param target     消息对象类型
  *  @param timeout    调用超时时间
  *  @param errPtr     错误句柄
  *
  *  @return 文件id
  */
-- (NSString *)wchatSendGroupFileWithThumbnail:(NSString *)gid
-                                         path:(NSString *)filepath
-                                     nailpath:(NSString *)nailpath
-                                      extBody:(NSData *)extContent
-                                      withTag:(NSInteger)tag
-                                     filetype:(WChatFileType)fileType
-                                  withTimeout:(NSTimeInterval)timeout
-                                        error:(NSError **)errPtr;
+- (NSString *)wchatSendFileWithThumbnail:(NSString *)toid
+                                  fileId:(NSString *)fid
+                                    path:(NSString *)filename
+                                nailpath:(NSString *)nailfile
+                                 extBody:(NSData *)extContent
+                               withIndex:(UInt32)index
+                                 withTag:(NSInteger)tag
+                                filetype:(YYWChatFileType)fileType
+                              targetType:(WChatMsgTargetType)target
+                             withTimeout:(NSTimeInterval)timeout
+                                   error:(NSError **)errPtr;
+
 
 #pragma mark - 消息未读数设置
 /**
@@ -461,7 +456,7 @@
  *  @param fileType     文件类型
  *  @param fileData     文件数据, 如果不发送文件请求则设为空
  *  @param customHeader 自定义请求header
- *  @param errPtr       错误句柄
+ *  @param errPtr       错误句柄    回调onShortResponse方法
  *
  *  @return 是否操作成功, YES是, NO否
  */
@@ -482,7 +477,7 @@
  *
  *  @param groupId  群组id
  */
-- (void) syncGroup:(NSString *)groupId;
+- (void)syncGroup:(NSString *)groupId;
 
 /**
  *  @brief 进入屏蔽的群, 开始获取此群组消息
@@ -490,13 +485,13 @@
  *  @param groupId   群组id
  *  @param messageId 消息id
  */
-- (void) syncBlockGroup:(NSString *)groupId
-          withMessageId:(NSString *)messageId;
+- (void)syncBlockGroup:(NSString *)groupId
+         withMessageId:(NSString *)messageId;
 
 /**
  *  @brief 退出屏蔽的群, 开始屏蔽此群消息
  */
-- (void) exitBlockGroup:(NSString *)groupId;
+- (void)exitBlockGroup:(NSString *)groupId;
 
 /**
  *  @brief 获取当前进入的群
@@ -809,7 +804,7 @@
     withMessageId:(NSString *)messageId
           fromUid:(NSString *)fromUid
             toUid:(NSString *)toUid
-         filetype:(WChatFileType)type
+         filetype:(YYWChatFileType)type
              time:(NSInteger)timevalue
           content:(NSData *)content
           extBody:(NSData *)extContent
@@ -832,11 +827,46 @@
          withMessageId:(NSString *)messageId
            withGroupId:(NSString *)gid
                fromUid:(NSString *)fromUid
-              filetype:(WChatFileType)type
+              filetype:(YYWChatFileType)type
                   time:(NSInteger)timevalue
                content:(NSData *)content
                extBody:(NSData *)extContent
              withError:(NSError *)error;
+
+/**
+ *  @brief 接收聊天室消息回调
+ *
+ *  @param instance      实例
+ *  @param messageId     消息id
+ *  @param rid           房间id
+ *  @param fromUid       发消息人Uid
+ *  @param type          消息类型
+ *  @param spanId        语音唯一标识
+ *  @param sequenceNo    语音分片编号, 如 1, 2, 3, ... -1, -1 表示结束
+ *  @param fileid        文件id
+ *  @param thumbnailData 缩略图二进制数据
+ *  @param length        文件长度
+ *  @param size          分片大小
+ *  @param timevalue     消息时间
+ *  @param content       消息内容
+ *  @param extContent    消息扩展内容
+ *  @param error         如收消息出错, 则返回错误信息
+ */
+- (void)onRecvChatRoomMsg:(WChatSDK *)instance
+            withMessageId:(NSString *)messageId
+               withRoomId:(NSString *)rid
+                  fromUid:(NSString *)fromUid
+                 filetype:(YYWChatFileType)type
+                   spanId:(NSString *)spanId
+               sequenceNo:(NSInteger)sequenceNo
+                   fileId:(NSString *)fileid
+                thumbnail:(NSData *)thumbnailData
+               filelength:(UInt64)length
+                pieceSize:(UInt32)size
+                     time:(NSInteger)timevalue
+                  content:(NSData *)content
+                  extBody:(NSData *)extContent
+                withError:(NSError *)error;
 
 /**
  *  @brief 接收语音消息回调
@@ -908,7 +938,7 @@
      withMessageId:(NSString *)messageId
            fromUid:(NSString *)fromUid
              toUid:(NSString *)toUid
-          filetype:(WChatFileType)type
+          filetype:(YYWChatFileType)type
               time:(NSInteger)timevalue
             fileId:(NSString *)fileid
          thumbnail:(NSData *)thumbnailData
@@ -937,7 +967,7 @@
           withMessageId:(NSString *)messageId
             withGroupId:(NSString *)gid
                 fromUid:(NSString *)fromUid
-               filetype:(WChatFileType)type
+               filetype:(YYWChatFileType)type
                    time:(NSInteger)timevalue
                  fileId:(NSString *)fileid
               thumbnail:(NSData *)thumbnailData
@@ -982,7 +1012,7 @@
              withMessageId:(NSString *)messageId
                    fromUid:(NSString *)fromUid
                      toUid:(NSString *)toUid
-                  filetype:(WChatFileType)type
+                  filetype:(YYWChatFileType)type
                     spanId:(NSString *)spanId
                 sequenceNo:(NSInteger)sequenceNo
                     fileId:(NSString *)fileid
@@ -1220,7 +1250,7 @@
 - (void)onSystemNotice:(WChatSDK *)instance
                fromUid:(NSString *)fromUid
                  toUid:(NSString *)toUid
-              filetype:(WChatFileType)type
+              filetype:(YYWChatFileType)type
                   time:(NSInteger)timevalue
                content:(NSData *)content
                extBody:(NSData *)extContent

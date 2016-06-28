@@ -12,16 +12,16 @@
 #define WChatErrorDomain @"WChatErrorDomain"
 
 //sdk版本
-#define WChatVersion @"3.8.18"
+#define WChatVersion @"3.9.0"
 
 //平台切换宏
-typedef enum {
+typedef NS_ENUM(NSInteger, WChatPlatform) {
     OnlinePlatform  = 1,    //线上平台
     TestPlatform    = 2,    //测试平台
-}WChatPlatform;
+};
 
 //错误类型
-typedef enum
+typedef NS_ENUM(NSInteger, YYWChatError)
 {
     WChatNoError               = 0,    // no error
 
@@ -49,60 +49,102 @@ typedef enum
     //opensdk
     WChatRegisterError         = 41,   //请求注册失败
     
-} WChatError;
+} ;
 
 //消息类型
-typedef enum
+typedef NS_ENUM(NSInteger, YYWChatFileType)
 {
-    WChatText      = 0x01,  //文本
-    WChatVoice     = 0x02,  //语音, 没有文件id
-    WChatVideo     = 0x03,  //视频
-    WChatImage     = 0x04,  //图片
-    WChatFile      = 0x05,  //文件
+    YYWChatFileTypeText      = 0x01,  //文本
+    YYWChatFileTypeVoice     = 0x02,  //语音, 没有文件id
+    YYWChatFileTypeVideo     = 0x03,  //视频
+    YYWChatFileTypeImage     = 0x04,  //图片
+    YYWChatFileTypeFile      = 0x05,  //文件
 
-    WChatOperation = 0x07,
-    WChatLocation  = 0x08,
-    WChatProperty  = 0x09,  // to be deleted
+    YYWChatFileTypeOperation = 0x07,
+    YYWChatFileTypeLocation  = 0x08,  // 位置
+    YYWChatFileTypeProperty  = 0x09,  // to be deleted
 
-    WChatHtml      = 0x10,
-    WChatMixed     = 0x11,
+    YYWChatFileTypeHtml      = 0x10,
+    YYWChatFileTypeMixed     = 0x11,  //自定义
     
-    WChatAudio     = 0x12,  //音频文件消息 有文件id
+    YYWChatFileTypeAudio     = 0x12,  //音频文件消息 有文件id
 
-    WChatSip       = 0x13,  //voip 单人电话
-    WChatConference= 0x14,  //接受电话会议邀请
+    YYWChatFileTypeSip       = 0x13,  //voip 单人电话
+    YYWChatFileTypeConference= 0x14,  //接受电话会议邀请
     
-    WChatUnknown   = 0x0,   //未知操作
+    YYWChatFileTypeUnknown   = 0x0,   //未知操作
 
-} WChatFileType;
+} ;
+/**
+ *  消息发送对象类型
+ */
+typedef NS_ENUM(NSInteger, WChatMsgTargetType) {
+    WChatMsgTargetTypeServer        = 0,
+    /**
+     *  个人
+     */
+    WChatMsgTargetTypeSingle        = 1,
+    /**
+     *  群组
+     */
+    WChatMsgTargetTypeGroup         = 2,
+    /**
+     *  聊天室
+     */
+    WChatMsgTargetTypeChatRoom      = 3,
+    
+};
+
+/**
+ *  创建群组类型
+ */
+typedef NS_ENUM(NSInteger, WChatGroupCategary) {
+    /**
+     *  临时群组
+     */
+    WChatGroupCategaryTmp,
+    /**
+     *  私人群组
+     */
+    WChatGroupCategaryPersonal,
+    /**
+     *  公共群租
+     */
+    WChatGroupCategaryPublic,
+    /**
+     *  聊天室
+     */
+    WChatGroupCategaryChatRoom,
+    
+};
 
 //小组操作类型
-typedef enum {
+typedef NS_ENUM(NSInteger, WChatGroupOperationType) {
     AddMember       = 0x01, //添加组员
     RemoveMember    = 0x02, //移除组员
     QuitGroup       = 0x03, //推出小组
 
-} WChatGroupOperationType;  //管理小组
+} ;  //管理小组
 
 //连接状态类型
-typedef enum {
+typedef NS_ENUM(NSInteger, WChatConnectState) {
     Disconnected    = 1,    //未连接 (默认)
     Connected       = 2,    //已连接
     Receiving       = 3,    //正在获取消息
     Connecting      = 4,    //连接中
     SystemConfig    = 5,    //系统设置(服务器返回,需要客户端处理,如多设备登陆,强制升级)
 
-} WChatConnectState;        //连接状态
+};        //连接状态
 
 //握手消息返回状态
-typedef enum {
+typedef NS_ENUM(NSInteger, WChatHandShakeCode) {
     AlreadyLogin        = 600,  //已经在其他设备登陆
     ForceUpgrade        = 601,  //强制升级
     
-}WChatHandShakeCode;            //握手状态
+};            //握手状态
 
 //notice消息类型
-typedef enum {
+typedef NS_ENUM(NSInteger, WChatNoticeType) {
     Typeing         = 1,    //正在输入
     KickOff         = 2,    //踢人
     ResetRemind     = 100,  //重置提醒
@@ -112,10 +154,10 @@ typedef enum {
     SyncSingleStatus= 1001, //同步个人消息未读状态
     SyncGroupStatus = 1002, //同步群消息未读状态
     
-}WChatNoticeType;           //notice类型
+};           //notice类型
 
 //conference 电话会议 calback 类型
-typedef enum {
+typedef NS_ENUM(NSInteger, cfcallbackType) {
     cfcallbackTypeNone              = 0,    //不是任何请求类型 用于默认设置
     cfcallbackTypeRoomRequest       = 1,    //请求房间
     cfcallbackTypeSendInvite        = 2,    //发送邀请
@@ -125,10 +167,10 @@ typedef enum {
     cfcallbackTypeUnmute            = 6,    //解禁
     cfcallbackTypeFetch             = 7,    //获取加入电话会议的成员
     cfcallbackTypeState             = 8,    //收到的是状态通知
-}cfcallbackType;
+};
 
 //conference 电话会议 状态变化通知 类型
-typedef enum {
+typedef NS_ENUM(NSInteger, cfstateType) {
     cfstateTypeNone       = 0,    //没有状态变化 用于默认设置
     cfstateTypeJoin       = 1,    //有人加入
     cfstateTypeMute       = 2,    //有人被禁言
@@ -136,5 +178,5 @@ typedef enum {
     cfstateTypeKick       = 4,    //有人被踢
     cfstateTypeLeft       = 5,    //有人离开
     cfstateTypeWillEnd    = 6,    //将要结束的通知
-}cfstateType;
+};
 #endif
