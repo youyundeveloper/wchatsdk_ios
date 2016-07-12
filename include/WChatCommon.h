@@ -49,7 +49,7 @@ typedef NS_ENUM(NSInteger, YYWChatError)
     //opensdk
     WChatRegisterError         = 41,   //请求注册失败
     
-} ;
+};
 
 //消息类型
 typedef NS_ENUM(NSInteger, YYWChatFileType)
@@ -63,9 +63,12 @@ typedef NS_ENUM(NSInteger, YYWChatFileType)
     YYWChatFileTypeOperation = 0x07,
     YYWChatFileTypeLocation  = 0x08,  // 位置
     YYWChatFileTypeProperty  = 0x09,  // to be deleted
+    
+    YYWChatFileTypeTextExt   = 0x0a,  // SDK文本扩展使用
+    YYWChatFileTypeCustom    = 0x0b,  // 自定义消息
 
     YYWChatFileTypeHtml      = 0x10,
-    YYWChatFileTypeMixed     = 0x11,  //自定义
+    YYWChatFileTypeMixed     = 0x11,  //JSON
     
     YYWChatFileTypeAudio     = 0x12,  //音频文件消息 有文件id
 
@@ -74,7 +77,7 @@ typedef NS_ENUM(NSInteger, YYWChatFileType)
     
     YYWChatFileTypeUnknown   = 0x0,   //未知操作
 
-} ;
+};
 /**
  *  消息发送对象类型
  */
@@ -124,7 +127,7 @@ typedef NS_ENUM(NSInteger, WChatGroupOperationType) {
     RemoveMember    = 0x02, //移除组员
     QuitGroup       = 0x03, //推出小组
 
-} ;  //管理小组
+};//管理小组
 
 //连接状态类型
 typedef NS_ENUM(NSInteger, WChatConnectState) {
@@ -134,14 +137,14 @@ typedef NS_ENUM(NSInteger, WChatConnectState) {
     Connecting      = 4,    //连接中
     SystemConfig    = 5,    //系统设置(服务器返回,需要客户端处理,如多设备登陆,强制升级)
 
-};        //连接状态
+};//连接状态
 
 //握手消息返回状态
 typedef NS_ENUM(NSInteger, WChatHandShakeCode) {
     AlreadyLogin        = 600,  //已经在其他设备登陆
     ForceUpgrade        = 601,  //强制升级
     
-};            //握手状态
+};//握手状态
 
 //notice消息类型
 typedef NS_ENUM(NSInteger, WChatNoticeType) {
@@ -154,7 +157,7 @@ typedef NS_ENUM(NSInteger, WChatNoticeType) {
     SyncSingleStatus= 1001, //同步个人消息未读状态
     SyncGroupStatus = 1002, //同步群消息未读状态
     
-};           //notice类型
+};//notice类型
 
 //conference 电话会议 calback 类型
 typedef NS_ENUM(NSInteger, cfcallbackType) {

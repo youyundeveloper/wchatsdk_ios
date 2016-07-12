@@ -20,6 +20,19 @@
 -(void)createGroupWithCompletionHandler:(void(^)(NSString *groupId, NSError* requestError))handler;
 
 /**
+ *  创建一个群组
+ *
+ *  @param name    群名称
+ *  @param desc    群简介
+ *  @param cate    群类别
+ *  @param handler 回调
+ */
+- (void)groupCreateName:(NSString *)name
+            description:(NSString *)desc
+               categary:(WChatGroupCategary)cate
+             completion:(void (^)(NSDictionary *response, NSError *err))handler;
+
+/**
  *  群组加人
  *
  *  @param groupId 群组id
@@ -46,7 +59,7 @@
 -(void)exitGroup:(NSString *)groupId CompletionHandler:(void(^)(BOOL isExit, NSError* requestError))handler;
 
 /**
- *  获取群组成员
+ *  获取群组成员ID
  *
  *  @param groupId 群组id
  *  @param handler 回调block (群组成员数据, 如果错误则返回错误信息)
@@ -59,6 +72,45 @@
  *  @param handler 回调block (用户的群组数据, 如果错误则返回错误信息)
  */
 -(void)getUserGroupsWithCompletionHandler:(void (^)(NSArray *groups, NSError* requestError))handler;
+/**
+ *  获取群组内的所有成员
+ *
+ *  @param gid     群id
+ *  @param handler 回调
+ */
+- (void)groupGetMember:(NSString *)gid completion:(void (^)(NSArray *members, NSError *err))handler;
+/**
+ *  销毁房间
+ *
+ *  @param gid     房间ID
+ *  @param handler 回调
+ */
+- (void)groupDelete:(NSString *)gid completion:(void (^)(BOOL sucess, NSError *err))handler;
+/**
+ *  获取群信息
+ *
+ *  @param gid     群组ID
+ *  @param handler 回调
+ */
+- (void)groupGetInfo:(NSString *)gid completion:(void (^)(NSDictionary *response, NSError *err))handler;
+/**
+ *  更新群组信息
+ *
+ *  @param gid     群ID
+ *  @param name    群名称
+ *  @param desc    群简介
+ *  @param cate    群类别
+ *  @param handler 回调
+ */
+- (void)groupUpdate:(NSString *)gid name:(NSString *)name description:(NSString *)desc categary:(WChatGroupCategary)cate completion:(void (^)(NSDictionary *response, NSError *err))handler;
+/**
+ *  申请加入群组
+ *
+ *  @param gid        群组ID
+ *  @param extContent 附言
+ *  @param handler    回调
+ */
+- (void)groupApplyJoinin:(NSString *)gid extContent:(NSString *)extContent completion:(void (^)(BOOL success, NSError *err))handler;
 
 #pragma mark - 黑名单相关接口
 

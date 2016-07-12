@@ -194,7 +194,7 @@
                    withContent:(NSString *)content
                          error:(NSError **)errPtr;
 
-#pragma mark - 发送文本消息接口
+#pragma mark - 发送文本(自定义)消息接口
 /**
  *  @brief 发送文本消息
  *
@@ -202,7 +202,9 @@
  *  @param content    消息内容
  *  @param extContent 扩展消息内容
  *  @param tag        消息标示, 用于回调
- *  @param type       消息类型
+ *  @param type       消息类型 
+ *                      YYWChatFileTypeCustom : 自定义消息(服务器不作处理)
+ *                      YYWChatFileTypeText : (服务器业务处理(e:敏感词...))
  *  @param target     消息对象类型
  *  @param timeout    调用超时时间
  *  @param errPtr     错误句柄
@@ -217,26 +219,6 @@
           targetType:(WChatMsgTargetType)target
          withTimeout:(NSTimeInterval)timeout
                error:(NSError **)errPtr;
-
-#pragma mark - 发送自定义(富文本)消息
-/**
- *  @brief 发送自定义(富文本)消息
- *
- *  @param toid       收消息人、群组、聊天室id
- *  @param content    消息内容
- *  @param extContent 扩展消息内容
- *  @param tag        消息标示, 用于回调
- *  @param type       发送对象类型
- *  @param timeout    调用超时时间
- *  @param errPrt     错误句柄
- */
-- (void)wchatSendMixedMsg:(NSString *)toid
-                     body:(NSData *)content
-                  extBody:(NSData *)extContent
-                      tag:(NSInteger)tag
-                     type:(WChatMsgTargetType)type
-                  timeout:(NSTimeInterval)timeout
-                    error:(NSError **)errPrt;
 
 #pragma mark - 发送语音消息接口
 
@@ -469,6 +451,22 @@
              withFileData:(NSData *)fileData
          withCustomHeader:(NSDictionary *)customHeader
                     error:(NSError **)errPtr;
+/**
+ *  异步短连请求
+ *
+ *  @param method     POST/GET
+ *  @param url        短链接URL
+ *  @param params     参数(para1=%@&param2=%d)
+ *  @param callbackId 回调ID
+ *  @param timeout    超时时间
+ *  @param handler    回调结果
+ */
+- (void)wchatAsyncRequest:(NSString*)method
+                      url:(NSString *)url
+                   params:(NSString *)params
+               callbackId:(NSInteger)callbackId
+                  timeout:(NSTimeInterval)timeout
+               completion:(void (^)(NSDictionary *json, NSError *error))handler;
 
 #pragma mark - 群组消息屏蔽
 

@@ -1,7 +1,7 @@
 在您阅读此文档之前，我们假定您已经具备了基础的 iOS 应用开发经验。
 # WChatSDK 快速集成
-在使用`WChatSDK`之前请，请前往 [官方网站](http://17youyun.com) 注册开发者帐号。注册时，您需要提供真实的邮箱和手机号，以方便我们向您发送重要通知并在紧急时刻能够联系到您。如果您没有提供正确可用的邮箱和手机号，我们随时可能关闭您的应用。
-## 1. 创建应用
+在使用`WChatSDK`之前请，请前往 [游云官方网站](http://17youyun.com) 注册开发者帐号。注册时，您需要提供真实的邮箱和手机号，以方便我们向您发送重要通知并在紧急时刻能够联系到您。如果您没有提供正确可用的邮箱和手机号，我们随时可能关闭您的应用。
+## 1. 工程准备
 注册了开发者账号之后，在进行开发 App 之前，您需要请前往 开发者控制台 创建应用。您创建完应用之后，在您的应用中，会自动创建两套的环境，即：开发环境和生产环境。创建应用成功后会生成对应开发环境的App唯一的`ClientID`和`Secret`。
 下载的`WChatSDK`包涵以下必要文件：
 
@@ -9,11 +9,11 @@
     include/WChatCommon.h
 	include/WChatSDK.h
 	include/WChatSDK+ServiceRequest.h
+	include/WChatSDK+ChatRoom.h
 	include/public.der
 	libWChatSDK.a
 	README.md
  ```
-### 1. 工程准备
 您在尝试集成 SDK 的时候，为了方便，可以新建一个工程。将下载的SDK导入工程，安装以下依赖库（如果已经导入请忽略）：
 
 - libsqlite3.tbd
@@ -33,7 +33,7 @@ iOS 9 中，Apple 引入了新特性 App Transport Security (ATS)，默认要求
 SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 App 的 *Info.plist 中添加 NSAppTransportSecurity 类型Dictionary。
 在 NSAppTransportSecurity 下添加 NSAllowsArbitraryLoads 类型 Boolean，值设为 YES。
 
-## 接口介绍
+## 2.接口介绍
 
 初始化sdk单例`[WChatSDK sharedInstance]`，通过该单例进行接口调用.
 
@@ -41,7 +41,42 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 
 ## 单例调用
 
-#### 1.初始化SDK
+#### 1.线上／测试平台授权登录
+
+其中UDID为了标示唯一的设备(用户)，如果UDID改变，则userid也将改变(SDK提供了根据设备生成的UDID，调用方法:`[WChatSDK getUDID]`)。 授权成功后，访问`userId` 属性会得到用户在游云的用户ID。
+
+	1. 线上平台授权登陆
+	/**
+	 *  @brief 注册设备
+	 *
+	 *  @param appUDID        设备唯一UDID
+	 *  @param clientId       开放平台下发的clientID
+	 *  @param secret         开放平台下发的sectet
+	 *  @param clientDelegate 回调代理
+	 */
+	-(void)registerApp:(NSString *)appUDID
+	          clientId:(NSString *)clientId
+	            secret:(NSString *)secret
+	          delegate:(id<WChatSDKDelegate>)clientDelegate;
+	           
+	2. 线下平台授权登陆
+	/**
+	 *  @brief 测试平台, 注册设备
+	 *
+	 *  @param appUDID        设备唯一UDID
+	 *  @param clientId       开放平台下发的clientID
+	 *  @param secret         开放平台下发的sectet
+	 *  @param clientDelegate 回调代理
+	 */
+	-(void)testRegisterApp:(NSString *)appUDID
+	              clientId:(NSString *)clientId
+	                secret:(NSString *)secret
+	              delegate:(id<WChatSDKDelegate>)clientDelegate;
+
+
+#### 2.初始化SDK
+
+如果使用 `线上／测试平台授权登录` 方式授权，则此初始化方法不需要调用。
 
 	/**
 	 *  @brief 初始化sdk
@@ -73,37 +108,10 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	 */
 	- (BOOL)unInitwchat;
 
-#### 2.线上／测试平台授权登录
-
-	1. 线上平台授权登陆
-	/**
-	 *  @brief 注册设备
-	 *
-	 *  @param appUDID        设备唯一UDID
-	 *  @param clientId       开放平台下发的clientID
-	 *  @param secret         开放平台下发的sectet
-	 *  @param clientDelegate 回调代理
-	 */
-	-(void)registerApp:(NSString *)appUDID
-	          clientId:(NSString *)clientId
-	            secret:(NSString *)secret
-	          delegate:(id<WChatSDKDelegate>)clientDelegate;
-	           
-	2. 线下平台授权登陆
-	/**
-	 *  @brief 测试平台, 注册设备
-	 *
-	 *  @param appUDID        设备唯一UDID
-	 *  @param clientId       开放平台下发的clientID
-	 *  @param secret         开放平台下发的sectet
-	 *  @param clientDelegate 回调代理
-	 */
-	-(void)testRegisterApp:(NSString *)appUDID
-	              clientId:(NSString *)clientId
-	                secret:(NSString *)secret
-	              delegate:(id<WChatSDKDelegate>)clientDelegate;
-
 #### 3.登录、退出、密码设置
+
+调用此登录方法需要调用初始化SDK方法。
+
 	/**
 	 *  @brief 登陆 (用户名, 密码)
 	 *
@@ -120,6 +128,23 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	      onBackGround:(BOOL)isOnBackground
 	       withTimeout:(NSTimeInterval)timeout
 	             error:(NSError **)errPtr;
+	             
+	/**
+	 *  @brief 登陆 (token)
+	 *
+	 *  @param token          授权token
+	 *  @param refreshToken   更新token
+	 *  @param isOnBackRround 是否后台登陆
+	 *  @param timeout        超时时间
+	 *  @param errPtr         错误句柄
+	 *
+	 *  @return 是否操作成功, YES是, NO否
+	 */
+	- (BOOL)wchatLoginWithToken:(NSString *)token
+	               refreshToken:(NSString *)refreshToken
+	               onBackGround:(BOOL)isOnBackground
+	                withTimeout:(NSTimeInterval)timeout
+	                      error:(NSError **)errPtr;
 
     /**
      *  @brief 登出
@@ -147,6 +172,8 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	- (NSString *)wchatGetMAuth;
 
 #### 4.前后台切换, 关闭连接, 重连
+
+此方法主要控制app在前后台切换，SDK与server间socket长连接处理。
 
     /**
      *  @brief 客户端回到前台, 开启服务器消息notice下发, 关闭推送 (进入前台调用)
@@ -176,20 +203,22 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 
 #### 5.发送单聊、群聊、聊天室文本消息接口
 
-	/**
-	 *  @brief 发送文本消息
-	 *
-	 *  @param toid       收消息人、群组、聊天室id
-	 *  @param content    消息内容
-	 *  @param extContent 扩展消息内容
-	 *  @param tag        消息标示, 用于回调
-	 *  @param type       消息类型
-	 *  @param target     消息对象类型
-	 *  @param timeout    调用超时时间
-	 *  @param errPtr     错误句柄
-	 *
-	 *  @return 消息是否正常发送, YES是, NO否
-	 */
+    /**
+     *  @brief 发送文本消息
+     *
+     *  @param toid       收消息人、群组、聊天室id
+     *  @param content    消息内容
+     *  @param extContent 扩展消息内容
+     *  @param tag        消息标示, 用于回调
+     *  @param type       消息类型 
+     *                      YYWChatFileTypeCustom : 自定义消息(服务器不作处理)
+     *                      YYWChatFileTypeText : (服务器业务处理(e:敏感词...))
+     *  @param target     消息对象类型
+     *  @param timeout    调用超时时间
+     *  @param errPtr     错误句柄
+     *
+     *  @return 消息是否正常发送, YES是, NO否
+     */
 	- (BOOL)wchatSendMsg:(NSString *)toid
 	                body:(NSData *)content
 	             extBody:(NSData *)extContent
@@ -342,29 +371,8 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	                              targetType:(WChatMsgTargetType)target
 	                             withTimeout:(NSTimeInterval)timeout
 	                                   error:(NSError **)errPtr;
-	                                   
-#### 9.发送单聊、群聊、聊天室自定义(富文本)消息接口
 
-	/**
-	 *  @brief 发送自定义(富文本)消息
-	 *
-	 *  @param toid       收消息人、群组、聊天室id
-	 *  @param content    消息内容
-	 *  @param extContent 扩展消息内容
-	 *  @param tag        消息标示, 用于回调
-	 *  @param type       发送对象类型
-	 *  @param timeout    调用超时时间
-	 *  @param errPrt     错误句柄
-	 */
-	- (void)wchatSendMixedMsg:(NSString *)toid
-	                     body:(NSData *)content
-	                  extBody:(NSData *)extContent
-	                      tag:(NSInteger)tag
-	                     type:(WChatMsgTargetType)type
-	                  timeout:(NSTimeInterval)timeout
-	                    error:(NSError **)errPrt;
-
-#### 10.设置消息未读数量
+#### 9.设置消息未读数量
 
 	/**
 	 *  @brief 设置消息未读数
@@ -393,7 +401,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	                         error:(NSError **)errPtr;
 
 
-#### 11.获取文件
+#### 10.获取文件
 
 	/**
 	 *  @brief 根据文件id获取文件, 分片获取
@@ -433,7 +441,25 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	         withTimeout:(NSTimeInterval)timeout
 	               error:(NSError **)errPtr;
 	               
-#### 12.工具辅助方法
+	此方法可以调用游云API短链接请求，请求结果已block()的方式返回。
+	/**
+	 *  异步短连请求
+	 *
+	 *  @param method     POST/GET
+	 *  @param url        短链接URL
+	 *  @param params     参数(para1=%@&param2=%d)
+	 *  @param callbackId 回调ID
+	 *  @param timeout    超时时间
+	 *  @param handler    回调结果
+	 */
+	- (void)wchatAsyncRequest:(NSString*)method
+	                      url:(NSString *)url
+	                   params:(NSString *)params
+	               callbackId:(NSInteger)callbackId
+	                  timeout:(NSTimeInterval)timeout
+	               completion:(void (^)(NSDictionary *json, NSError *error))handler;
+	               
+#### 11.工具辅助方法
 
 	/**
 	 *  @brief 加密数据
@@ -481,7 +507,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	 */
 	- (void)setSipMediaPort:(NSInteger)port;
 	
-#### 13.多人会议(conference)接口
+#### 12.多人会议(conference)接口
 
 	/**
 	 *  @brief 请求一个会话房间
@@ -567,9 +593,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 
 
 
-
-
-#SDK代理回调
+## 3. SDK代理回调
 
 #### @required
 
@@ -1104,7 +1128,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	 **/
 	-(void)liveHostLeaveWithUidRoomidDic:(NSDictionary *)dic;
 
-# 群组业务接口
+## 4. 群组业务接口
 
 #### 1.群组 - 管理相关接口
 
@@ -1114,6 +1138,19 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
      *  @param handler 回调block (创建成功的群组id, 如果错误则返回错误信息)
      */
     -(void)createGroupWithCompletionHandler:(void(^)(NSString *groupId, NSError* requestError))handler;
+    
+    /**
+	 *  创建一个条件群组
+	 *
+	 *  @param name    群名称
+	 *  @param desc    群简介
+	 *  @param cate    群类别
+	 *  @param handler 回调
+	 */
+	- (void)groupCreateName:(NSString *)name
+	            description:(NSString *)desc
+	               categary:(WChatGroupCategary)cate
+	             completion:(void (^)(NSDictionary *response, NSError *err))handler;
 
     /**
      *  群组加人
@@ -1155,6 +1192,47 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
      *  @param handler 回调block (用户的群组数据, 如果错误则返回错误信息)
      */
     -(void)getUserGroupsWithCompletionHandler:(void (^)(NSArray *groups, NSError* requestError))handler;
+    
+	/**
+	 *  获取群组内的所有成员
+	 *
+	 *  @param gid     群id
+	 *  @param handler 回调
+	 */
+	- (void)groupGetMember:(NSString *)gid completion:(void (^)(NSArray *members, NSError *err))handler;
+	/**
+	 *  销毁房间
+	 *
+	 *  @param gid     房间ID
+	 *  @param handler 回调
+	 */
+	- (void)groupDelete:(NSString *)gid completion:(void (^)(BOOL sucess, NSError *err))handler;
+	/**
+	 *  获取群信息
+	 *
+	 *  @param gid     群组ID
+	 *  @param handler 回调
+	 */
+	- (void)groupGetInfo:(NSString *)gid completion:(void (^)(NSDictionary *response, NSError *err))handler;
+	/**
+	 *  更新群组信息
+	 *
+	 *  @param gid     群ID
+	 *  @param name    群名称
+	 *  @param desc    群简介
+	 *  @param cate    群类别
+	 *  @param handler 回调
+	 */
+	- (void)groupUpdate:(NSString *)gid name:(NSString *)name description:(NSString *)desc categary:(WChatGroupCategary)cate completion:(void (^)(NSDictionary *response, NSError *err))handler;
+	/**
+	 *  申请加入群组
+	 *
+	 *  @param gid        群组ID
+	 *  @param extContent 附言
+	 *  @param handler    回调
+	 */
+	- (void)groupApplyJoinin:(NSString *)gid extContent:(NSString *)extContent completion:(void (^)(BOOL success, NSError *err))handler;
+	
 
 #### 2.黑名单相关接口
 
@@ -1231,7 +1309,9 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
     -(void)deviceInfoWithCompletionHandler:(void (^)(NSDictionary *deviceInfo, NSError* requestError))handler;
 
 
-# 聊天室业务接口
+## 5. 聊天室业务接口
+
+此接口用户聊天室相关业务。
 
 	/**
 	 *  创建聊天室群租
@@ -1252,14 +1332,17 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	- (void)chatRoomDelete:(NSString *)roomid
 	            completion:(void (^)(BOOL success, NSError *err))handler;
 	
-	/**
-	 *  进入聊天室房间
-	 *
-	 *  @param roomid  聊天室房间ID
-	 *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
-	 */
-	- (void)chatRoomEnter:(NSString *)roomid
-	           completion:(void(^)(BOOL isEnter, NSError *err))handler;
+    /**
+     *  进入聊天室房间
+     *
+     *  @param roomid  聊天室房间ID
+     *  @param alias   别名(接入方的用户ID，用来和游云ID做映射)
+     *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
+     */
+    - (void)chatRoomEnter:(NSString *)roomid
+                  aliasid:(NSString *)alias
+               completion:(void(^)(BOOL isEnter, NSError *err))handler;
+
 	
 	/**
 	 *  退出聊天室房间
@@ -1302,3 +1385,18 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	                    roomid:(NSString *)roomid
 	                    forbid:(int)isForbid
 	                completion:(void (^)(BOOL success, NSError *err))handler;
+	                
+	/**
+	 *  聊天室聊天历史消息
+	 *
+	 *  @param roomid    群组id
+	 *  @param timestamp 时间戳(精确到秒)
+	 *  @param size      数据条数(服务器默认一次最多取20)
+	 *  @param handler   回调block (历史消息数据, 如果错误则返回错误信息)
+	 *					  结果倒叙(新消息arr[0],就消息arr[1])
+	 */
+	-(void)chatRoomGetHistory:(NSString *)roomid
+	                timestamp:(NSInteger)timestamp
+	                     size:(NSInteger)size
+	        completionHandler:(void (^)(NSArray *response, NSError *err))handler;
+	                
