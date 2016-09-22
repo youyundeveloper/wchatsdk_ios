@@ -1,7 +1,7 @@
 在您阅读此文档之前，我们假定您已经具备了基础的 iOS 应用开发经验。
 # WChatSDK 快速集成
-在使用`WChatSDK`之前请，请前往 [游云官方网站](http://17youyun.com) 注册开发者帐号。注册时，您需要提供真实的邮箱和手机号，以方便我们向您发送重要通知并在紧急时刻能够联系到您。如果您没有提供正确可用的邮箱和手机号，我们随时可能关闭您的应用。
-## 1. 工程准备
+在使用`WChatSDK`之前请，请前往 [官方网站](http://17youyun.com) 注册开发者帐号。注册时，您需要提供真实的邮箱和手机号，以方便我们向您发送重要通知并在紧急时刻能够联系到您。如果您没有提供正确可用的邮箱和手机号，我们随时可能关闭您的应用。
+## 1. 创建应用
 注册了开发者账号之后，在进行开发 App 之前，您需要请前往 开发者控制台 创建应用。您创建完应用之后，在您的应用中，会自动创建两套的环境，即：开发环境和生产环境。创建应用成功后会生成对应开发环境的App唯一的`ClientID`和`Secret`。
 下载的`WChatSDK`包涵以下必要文件：
 
@@ -9,11 +9,11 @@
     include/WChatCommon.h
 	include/WChatSDK.h
 	include/WChatSDK+ServiceRequest.h
-	include/WChatSDK+ChatRoom.h
 	include/public.der
 	libWChatSDK.a
 	README.md
  ```
+### 1. 工程准备
 您在尝试集成 SDK 的时候，为了方便，可以新建一个工程。将下载的SDK导入工程，安装以下依赖库（如果已经导入请忽略）：
 
 - libsqlite3.tbd
@@ -33,7 +33,7 @@ iOS 9 中，Apple 引入了新特性 App Transport Security (ATS)，默认要求
 SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 App 的 *Info.plist 中添加 NSAppTransportSecurity 类型Dictionary。
 在 NSAppTransportSecurity 下添加 NSAllowsArbitraryLoads 类型 Boolean，值设为 YES。
 
-## 2.接口介绍
+## 接口介绍
 
 初始化sdk单例`[WChatSDK sharedInstance]`，通过该单例进行接口调用.
 
@@ -41,559 +41,571 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 
 ## 单例调用
 
-#### 1.线上／测试平台授权登录
+#### 1.初始化SDK
 
-其中UDID为了标示唯一的设备(用户)，如果UDID改变，则userid也将改变(SDK提供了根据设备生成的UDID，调用方法:`[WChatSDK getUDID]`)。 授权成功后，访问`userId` 属性会得到用户在游云的用户ID。
+```objective-c
+/**
+ *  @brief 初始化sdk
+ *
+ *  @param cachePath      缓存目录路径, 通常为Documents
+ *  @param platform       使用平台, 目前仅支持 (线上平台 OnlinePlatform , 测试平台 TestPlatform)
+ *  @param channel        渠道号
+ *  @param clientId       客户端id
+ *  @param clientVersion  客户端版本号, 如 1.2.3
+ *  @param clientLanguage 客户端语言, 如 CN , 规范见 http://en.wikipedia.org/wiki/ISO_3166-1
+ *  @param aDelegate      回调代理
+ *  @param errPtr         错误句柄
+ *
+ *  @return 是否操作成功, YES是, NO否
+ */
+- (BOOL)init:(NSString *)cachePath
+    platform:(WChatPlatform)platform
+     channel:(NSString *)channel
+    clientId:(NSString *)clientId
+     version:(NSString *)clientVersion
+    language:(NSString *)clientLanguage
+    delegate:(id)aDelegate
+       error:(NSError **)errPtr;
+ 
+/**
+ *  @brief 注销sdk
+ *
+ *  @return 是否操作成功, YES是, NO否
+ */
+- (BOOL)unInitwchat;
+```
 
-	1. 线上平台授权登陆
-	/**
-	 *  @brief 注册设备
-	 *
-	 *  @param appUDID        设备唯一UDID
-	 *  @param clientId       开放平台下发的clientID
-	 *  @param secret         开放平台下发的sectet
-	 *  @param clientDelegate 回调代理
-	 */
-	-(void)registerApp:(NSString *)appUDID
-	          clientId:(NSString *)clientId
-	            secret:(NSString *)secret
-	          delegate:(id<WChatSDKDelegate>)clientDelegate;
-	           
-	2. 线下平台授权登陆
-	/**
-	 *  @brief 测试平台, 注册设备
-	 *
-	 *  @param appUDID        设备唯一UDID
-	 *  @param clientId       开放平台下发的clientID
-	 *  @param secret         开放平台下发的sectet
-	 *  @param clientDelegate 回调代理
-	 */
-	-(void)testRegisterApp:(NSString *)appUDID
-	              clientId:(NSString *)clientId
-	                secret:(NSString *)secret
-	              delegate:(id<WChatSDKDelegate>)clientDelegate;
+#### 2.线上／测试平台授权登录
 
-
-#### 2.初始化SDK
-
-如果使用 `线上／测试平台授权登录` 方式授权，则此初始化方法不需要调用。
-
-	/**
-	 *  @brief 初始化sdk
-	 *
-	 *  @param cachePath      缓存目录路径, 通常为Documents
-	 *  @param platform       使用平台, 目前仅支持 (线上平台 OnlinePlatform , 测试平台 TestPlatform)
-	 *  @param channel        渠道号
-	 *  @param clientId       客户端id
-	 *  @param clientVersion  客户端版本号, 如 1.2.3
-	 *  @param clientLanguage 客户端语言, 如 CN , 规范见 http://en.wikipedia.org/wiki/ISO_3166-1
-	 *  @param aDelegate      回调代理
-	 *  @param errPtr         错误句柄
-	 *
-	 *  @return 是否操作成功, YES是, NO否
-	 */
-	- (BOOL)init:(NSString *)cachePath
-	    platform:(WChatPlatform)platform
-	     channel:(NSString *)channel
-	    clientId:(NSString *)clientId
-	     version:(NSString *)clientVersion
-	    language:(NSString *)clientLanguage
-	    delegate:(id)aDelegate
-	       error:(NSError **)errPtr;
-	 
-	/**
-	 *  @brief 注销sdk
-	 *
-	 *  @return 是否操作成功, YES是, NO否
-	 */
-	- (BOOL)unInitwchat;
+```objective-c
+1. 线上平台授权登陆
+/**
+ *  @brief 注册设备
+ *
+ *  @param appUDID        设备唯一UDID
+ *  @param clientId       开放平台下发的clientID
+ *  @param secret         开放平台下发的sectet
+ *  @param clientDelegate 回调代理
+ */
+-(void)registerApp:(NSString *)appUDID
+          clientId:(NSString *)clientId
+            secret:(NSString *)secret
+          delegate:(id<WChatSDKDelegate>)clientDelegate;
+           
+2. 线下平台授权登陆
+/**
+ *  @brief 测试平台, 注册设备
+ *
+ *  @param appUDID        设备唯一UDID
+ *  @param clientId       开放平台下发的clientID
+ *  @param secret         开放平台下发的sectet
+ *  @param clientDelegate 回调代理
+ */
+-(void)testRegisterApp:(NSString *)appUDID
+              clientId:(NSString *)clientId
+                secret:(NSString *)secret
+              delegate:(id<WChatSDKDelegate>)clientDelegate;
+```
 
 #### 3.登录、退出、密码设置
+```objective-c
+/**
+ *  @brief 登陆 (用户名, 密码)
+ *
+ *  @param username       用户名
+ *  @param password       密码
+ *  @param isOnBackRround 是否后台登陆
+ *  @param timeout        超时时间
+ *  @param errPtr         错误句柄
+ *
+ *  @return 是否操作成功, YES是, NO否
+ */
+- (BOOL)wchatLogin:(NSString *)username
+          password:(NSString *)password
+      onBackGround:(BOOL)isOnBackground
+       withTimeout:(NSTimeInterval)timeout
+             error:(NSError **)errPtr;
 
-调用此登录方法需要调用初始化SDK方法。
+/**
+ *  @brief 登出
+ *
+ *  @param timeout 调用超时时间
+ */
+-(void)wchatLogout:(NSTimeInterval)timeout;
 
-	/**
-	 *  @brief 登陆 (用户名, 密码)
-	 *
-	 *  @param username       用户名
-	 *  @param password       密码
-	 *  @param isOnBackRround 是否后台登陆
-	 *  @param timeout        超时时间
-	 *  @param errPtr         错误句柄
-	 *
-	 *  @return 是否操作成功, YES是, NO否
-	 */
-	- (BOOL)wchatLogin:(NSString *)username
-	          password:(NSString *)password
-	      onBackGround:(BOOL)isOnBackground
-	       withTimeout:(NSTimeInterval)timeout
-	             error:(NSError **)errPtr;
-	             
-	/**
-	 *  @brief 登陆 (token)
-	 *
-	 *  @param token          授权token
-	 *  @param refreshToken   更新token
-	 *  @param isOnBackRround 是否后台登陆
-	 *  @param timeout        超时时间
-	 *  @param errPtr         错误句柄
-	 *
-	 *  @return 是否操作成功, YES是, NO否
-	 */
-	- (BOOL)wchatLoginWithToken:(NSString *)token
-	               refreshToken:(NSString *)refreshToken
-	               onBackGround:(BOOL)isOnBackground
-	                withTimeout:(NSTimeInterval)timeout
-	                      error:(NSError **)errPtr;
+/**
+ *  @brief 重设密码
+ *
+ *  @param password 用户密码
+ *  @param errPtr   错误句柄
+ *
+ *  @return 是否操作成功, YES是, NO否
+ */
+- (BOOL)wchatResetPassword:(NSString *)password
+                     error:(NSError **)errPtr;
 
-    /**
-     *  @brief 登出
-     *
-     *  @param timeout 调用超时时间
-     */
-    -(void)wchatLogout:(NSTimeInterval)timeout;
-    
-    /**
-	 *  @brief 重设密码
-	 *
-	 *  @param password 用户密码
-	 *  @param errPtr   错误句柄
-	 *
-	 *  @return 是否操作成功, YES是, NO否
-	 */
-	- (BOOL)wchatResetPassword:(NSString *)password
-	                     error:(NSError **)errPtr;
-	
-	/**
-	 *  @brief 获取登陆后的授权码(用于接口调用等)
-	 *
-	 *  @return 授权码
-	 */
-	- (NSString *)wchatGetMAuth;
+/**
+ *  @brief 获取登陆后的授权码(用于接口调用等)
+ *
+ *  @return 授权码
+ */
+- (NSString *)wchatGetMAuth;
+```
 
 #### 4.前后台切换, 关闭连接, 重连
 
-此方法主要控制app在前后台切换，SDK与server间socket长连接处理。
+```objective-c
+/**
+ *  @brief 客户端回到前台, 开启服务器消息notice下发, 关闭推送 (进入前台调用)
+ *
+ *  @param timeout 调用超时时间
+ */
+- (void)wchatKeepAlive:(NSTimeInterval)timeout;
 
-    /**
-     *  @brief 客户端回到前台, 开启服务器消息notice下发, 关闭推送 (进入前台调用)
-     *
-     *  @param timeout 调用超时时间
-     */
-    - (void)wchatKeepAlive:(NSTimeInterval)timeout;
+/**
+ *  @brief 客户端退到后台, 关闭服务器消息notice下发, 开启推送 (进入后台调用)
+ *
+ *  @param timeout 调用超时时间
+ */
+- (void)wchatPreClose:(NSTimeInterval)timeout;
 
-    /**
-     *  @brief 客户端退到后台, 关闭服务器消息notice下发, 开启推送 (进入后台调用)
-     *
-     *  @param timeout 调用超时时间
-     */
-    - (void)wchatPreClose:(NSTimeInterval)timeout;
+/**
+ *  @brief 关闭连接
+ *
+ *  @param timeout 调用超时时间
+ */
+- (void)wchatClose:(NSTimeInterval)timeout;
 
-    /**
-     *  @brief 关闭连接
-     *
-     *  @param timeout 调用超时时间
-     */
-    - (void)wchatClose:(NSTimeInterval)timeout;
-
-    /**
-     *  @brief 重新连接
-     */
-    - (void)wchatReconnect;
+/**
+ *  @brief 重新连接
+ */
+- (void)wchatReconnect;
+```
 
 #### 5.发送单聊、群聊、聊天室文本消息接口
 
-    /**
-     *  @brief 发送文本消息
-     *
-     *  @param toid       收消息人、群组、聊天室id
-     *  @param content    消息内容
-     *  @param extContent 扩展消息内容
-     *  @param tag        消息标示, 用于回调
-     *  @param type       消息类型 
-     *                      YYWChatFileTypeCustom : 自定义消息(服务器不作处理)
-     *                      YYWChatFileTypeText : (服务器业务处理(e:敏感词...))
-     *  @param target     消息对象类型
-     *  @param timeout    调用超时时间
-     *  @param errPtr     错误句柄
-     *
-     *  @return 消息是否正常发送, YES是, NO否
-     */
-	- (BOOL)wchatSendMsg:(NSString *)toid
-	                body:(NSData *)content
-	             extBody:(NSData *)extContent
-	             withTag:(NSInteger)tag
-	            withType:(YYWChatFileType)type
-	          targetType:(WChatMsgTargetType)target
-	         withTimeout:(NSTimeInterval)timeout
-	               error:(NSError **)errPtr;
+```objective-c
+/**
+ *  @brief 发送文本消息
+ *
+ *  @param toid       收消息人、群组、聊天室id
+ *  @param content    消息内容
+ *  @param extContent 扩展消息内容
+ *  @param tag        消息标示, 用于回调
+ *  @param type       消息类型 
+ *                      YYWChatFileTypeCustom : 自定义消息(服务器不作处理)
+ *                      YYWChatFileTypeText : (服务器业务处理(e:敏感词...))
+ *  @param target     消息对象类型
+ *  @param timeout    调用超时时间
+ *  @param errPtr     错误句柄
+ *
+ *  @return 消息是否正常发送, YES是, NO否
+ */
+- (BOOL)wchatSendMsg:(NSString *)toid
+                body:(NSData *)content
+             extBody:(NSData *)extContent
+             withTag:(NSInteger)tag
+            withType:(YYWChatFileType)type
+          targetType:(WChatMsgTargetType)target
+         withTimeout:(NSTimeInterval)timeout
+               error:(NSError **)errPtr;
+```
 
 
 #### 6.发送单聊、群聊、聊天室语音消息接口
 
-	/**
-	 *  @brief 发送音频消息
-	 *
-	 *  @param toid       收消息人、群组、聊天室id
-	 *  @param spanId     语音唯一标示
-	 *  @param sequenceNo 语音分片编号, 如 1, 2, 3, ... -1, -1 表示结束
-	 *  @param content    语音消息内容
-	 *  @param ext        扩展消息内容
-	 *  @param tag        消息标示, 用于回调
-	 *  @param target     消息对象类型
-	 *  @param timeout    调用超时时间
-	 *  @param errPtr     错误句柄
-	 *
-	 *  @return 消息是否正常发送, YES是, NO否
-	 */
-	- (BOOL)wchatSendVoice:(NSString *)toid
-	                spanId:(NSString *)spanId
-	            sequenceNo:(NSInteger)sequenceNo
-	               content:(NSData *)content
-	                   ext:(NSData *)ext
-	               withTag:(NSInteger)tag
-	            targetType:(WChatMsgTargetType)target
-	           withTimeout:(NSTimeInterval)timeout
-	                 error:(NSError **)errPtr;
-	
-	/**
-	 *  @brief 获取语音唯一标示
-	 *
-	 *  @param tuid 收消息人Uid
-	 *
-	 *  @return 语音消息唯一标示
-	 */
-	- (NSString *)getVoiceSpanId:(NSString *)tuid;
+```objective-c
+/**
+ *  @brief 发送音频消息
+ *
+ *  @param toid       收消息人、群组、聊天室id
+ *  @param spanId     语音唯一标示
+ *  @param sequenceNo 语音分片编号, 如 1, 2, 3, ... -1, -1 表示结束
+ *  @param content    语音消息内容
+ *  @param ext        扩展消息内容
+ *  @param tag        消息标示, 用于回调
+ *  @param target     消息对象类型
+ *  @param timeout    调用超时时间
+ *  @param errPtr     错误句柄
+ *
+ *  @return 消息是否正常发送, YES是, NO否
+ */
+- (BOOL)wchatSendVoice:(NSString *)toid
+                spanId:(NSString *)spanId
+            sequenceNo:(NSInteger)sequenceNo
+               content:(NSData *)content
+                   ext:(NSData *)ext
+               withTag:(NSInteger)tag
+            targetType:(WChatMsgTargetType)target
+           withTimeout:(NSTimeInterval)timeout
+                 error:(NSError **)errPtr;
+
+/**
+ *  @brief 获取语音唯一标示
+ *
+ *  @param tuid 收消息人Uid
+ *
+ *  @return 语音消息唯一标示
+ */
+- (NSString *)getVoiceSpanId:(NSString *)tuid;
+```
 
 #### 7.发送单聊、群聊、聊天室文件消息接口
 
-	/**
-	 *  @brief 发送文件给个人、群组
-	 *
-	 *  @param toid       收消息人、群组、聊天室id
-	 *  @param filepath   文件路径
-	 *  @param extContent 扩展消息内容
-	 *  @param tag        消息标示, 用于回调
-	 *  @param fileType   文件类型
-	 *  @param target     消息对象类型
-	 *  @param timeout    调用超时时间
-	 *  @param errPtr     错误句柄
-	 *
-	 *  @return 文件id
-	 */
-	- (NSString *)wchatSendFile:(NSString *)toid
-	                       path:(NSString *)filepath
-	                    extBody:(NSData *)extContent
-	                    withTag:(NSInteger)tag
-	                   filetype:(YYWChatFileType)fileType
-	                 targetType:(WChatMsgTargetType)target
-	                withTimeout:(NSTimeInterval)timeout
-	                      error:(NSError **)errPtr;
-	
-	/**
-	 *	@brief 发送文件给个人、群组, 断点续传
-	 *
-	 *  @param toid       收消息人、群组、聊天室id
-	 *  @param fid        文件id
-	 *  @param filepath   文件路径
-	 *  @param extContent 扩展消息内容
-	 *  @param index      文件片数索引
-	 *  @param tag        消息标示, 用于回调
-	 *  @param fileType   文件类型
-	 *  @param target     消息对象类型
-	 *  @param timeout    调用超时时间
-	 *  @param errPtr     错误句柄
-	 *
-	 *  @return 文件id
-	 */
-	- (NSString *)wchatSendFile:(NSString *)toid
-	                    withFid:(NSString *)fid
-	                       path:(NSString *)filename
-	                    extBody:(NSData *)extContent
-	                  withIndex:(UInt32)index
-	                    withTag:(NSInteger)tag
-	                   filetype:(YYWChatFileType)fileType
-	                 targetType:(WChatMsgTargetType)target
-	                withTimeout:(NSTimeInterval)timeout
-	                      error:(NSError **)errPtr;
-	                      
+```objective-c
+/**
+ *  @brief 发送文件给个人、群组
+ *
+ *  @param toid       收消息人、群组、聊天室id
+ *  @param filepath   文件路径
+ *  @param extContent 扩展消息内容
+ *  @param tag        消息标示, 用于回调
+ *  @param fileType   文件类型
+ *  @param target     消息对象类型
+ *  @param timeout    调用超时时间
+ *  @param errPtr     错误句柄
+ *
+ *  @return 文件id
+ */
+- (NSString *)wchatSendFile:(NSString *)toid
+                       path:(NSString *)filepath
+                    extBody:(NSData *)extContent
+                    withTag:(NSInteger)tag
+                   filetype:(YYWChatFileType)fileType
+                 targetType:(WChatMsgTargetType)target
+                withTimeout:(NSTimeInterval)timeout
+                      error:(NSError **)errPtr;
+
+/**
+ *	@brief 发送文件给个人、群组, 断点续传
+ *
+ *  @param toid       收消息人、群组、聊天室id
+ *  @param fid        文件id
+ *  @param filepath   文件路径
+ *  @param extContent 扩展消息内容
+ *  @param index      文件片数索引
+ *  @param tag        消息标示, 用于回调
+ *  @param fileType   文件类型
+ *  @param target     消息对象类型
+ *  @param timeout    调用超时时间
+ *  @param errPtr     错误句柄
+ *
+ *  @return 文件id
+ */
+- (NSString *)wchatSendFile:(NSString *)toid
+                    withFid:(NSString *)fid
+                       path:(NSString *)filename
+                    extBody:(NSData *)extContent
+                  withIndex:(UInt32)index
+                    withTag:(NSInteger)tag
+                   filetype:(YYWChatFileType)fileType
+                 targetType:(WChatMsgTargetType)target
+                withTimeout:(NSTimeInterval)timeout
+                      error:(NSError **)errPtr;
+```
+
 #### 8.发送单聊、群聊、聊天室图片消息接口
 
-	/**
-	 *  @brief 发送文件(图片)给个人、群组, 带缩略图
-	 *
-	 *  @param toid       收消息人、群组、聊天室id
-	 *  @param filepath   文件路径
-	 *  @param nailpath   缩略图路径
-	 *  @param extContent 扩展消息内容
-	 *  @param tag        消息标示, 用于回调
-	 *  @param fileType   文件类型
-	 *  @param target     消息对象类型
-	 *  @param timeout    调用超时时间
-	 *  @param errPtr     错误句柄
-	 *
-	 *  @return 文件id
-	 */
-	- (NSString *)wchatSendFileWithThumbnail:(NSString *)toid
-	                                    path:(NSString *)filepath
-	                                nailpath:(NSString *)nailpath
-	                                 extBody:(NSData *)extContent
-	                                 withTag:(NSInteger)tag
-	                                filetype:(YYWChatFileType)fileType
-	                              targetType:(WChatMsgTargetType)target
-	                             withTimeout:(NSTimeInterval)timeout
-	                                   error:(NSError **)errPtr;
-	/**
-	 *	@brief 发送文件给个人、群组, 带缩略图, 断点续传
-	 *
-	 *  @param toid       收消息人、群组、聊天室id
-	 *  @param fid        文件id
-	 *  @param filepath   文件路径
-	 *  @param nailpath   缩略图路径
-	 *  @param extContent 扩展消息内容
-	 *  @param index      文件片数索引
-	 *  @param tag        消息标示, 用于回调
-	 *  @param fileType   文件类型
-	 *  @param target     消息对象类型
-	 *  @param timeout    调用超时时间
-	 *  @param errPtr     错误句柄
-	 *
-	 *  @return 文件id
-	 */
-	- (NSString *)wchatSendFileWithThumbnail:(NSString *)toid
-	                                  fileId:(NSString *)fid
-	                                    path:(NSString *)filename
-	                                nailpath:(NSString *)nailfile
-	                                 extBody:(NSData *)extContent
-	                               withIndex:(UInt32)index
-	                                 withTag:(NSInteger)tag
-	                                filetype:(YYWChatFileType)fileType
-	                              targetType:(WChatMsgTargetType)target
-	                             withTimeout:(NSTimeInterval)timeout
-	                                   error:(NSError **)errPtr;
+```objective-c
+/**
+ *  @brief 发送文件(图片)给个人、群组, 带缩略图
+ *
+ *  @param toid       收消息人、群组、聊天室id
+ *  @param filepath   文件路径
+ *  @param nailpath   缩略图路径
+ *  @param extContent 扩展消息内容
+ *  @param tag        消息标示, 用于回调
+ *  @param fileType   文件类型
+ *  @param target     消息对象类型
+ *  @param timeout    调用超时时间
+ *  @param errPtr     错误句柄
+ *
+ *  @return 文件id
+ */
+- (NSString *)wchatSendFileWithThumbnail:(NSString *)toid
+                                    path:(NSString *)filepath
+                                nailpath:(NSString *)nailpath
+                                 extBody:(NSData *)extContent
+                                 withTag:(NSInteger)tag
+                                filetype:(YYWChatFileType)fileType
+                              targetType:(WChatMsgTargetType)target
+                             withTimeout:(NSTimeInterval)timeout
+                                   error:(NSError **)errPtr;
+/**
+ *	@brief 发送文件给个人、群组, 带缩略图, 断点续传
+ *
+ *  @param toid       收消息人、群组、聊天室id
+ *  @param fid        文件id
+ *  @param filepath   文件路径
+ *  @param nailpath   缩略图路径
+ *  @param extContent 扩展消息内容
+ *  @param index      文件片数索引
+ *  @param tag        消息标示, 用于回调
+ *  @param fileType   文件类型
+ *  @param target     消息对象类型
+ *  @param timeout    调用超时时间
+ *  @param errPtr     错误句柄
+ *
+ *  @return 文件id
+ */
+- (NSString *)wchatSendFileWithThumbnail:(NSString *)toid
+                                  fileId:(NSString *)fid
+                                    path:(NSString *)filename
+                                nailpath:(NSString *)nailfile
+                                 extBody:(NSData *)extContent
+                               withIndex:(UInt32)index
+                                 withTag:(NSInteger)tag
+                                filetype:(YYWChatFileType)fileType
+                              targetType:(WChatMsgTargetType)target
+                             withTimeout:(NSTimeInterval)timeout
+                                   error:(NSError **)errPtr;
+```
 
 #### 9.设置消息未读数量
 
-	/**
-	 *  @brief 设置消息未读数
-	 *
-	 *  @param number 未读数数量
-	 *  @param tag    消息标示, 用于回调
-	 *  @param errPtr 错误句柄
-	 *
-	 *  @return 是否发送设置, YES是, NO否
-	 */
-	- (BOOL)wchatSetUnreadNumber:(NSInteger)number
-	                     withTag:(NSInteger)tag
-	                       error:(NSError **)errPtr;
-	
-	/**
-	 *  @brief 设置消息未读数 - number
-	 *
-	 *  @param number 减掉的消息未读数
-	 *  @param tag    消息标示, 用于回调
-	 *  @param errPtr 错误句柄
-	 *
-	 *  @return 是否发送设置, YES是, NO否
-	 */
-	- (BOOL)wchatMinusUnreadNumber:(NSInteger)number
-	                       withTag:(NSInteger)tag
-	                         error:(NSError **)errPtr;
+```objective-c
+/**
+ *  @brief 设置消息未读数
+ *
+ *  @param number 未读数数量
+ *  @param tag    消息标示, 用于回调
+ *  @param errPtr 错误句柄
+ *
+ *  @return 是否发送设置, YES是, NO否
+ */
+- (BOOL)wchatSetUnreadNumber:(NSInteger)number
+                     withTag:(NSInteger)tag
+                       error:(NSError **)errPtr;
+
+/**
+ *  @brief 设置消息未读数 - number
+ *
+ *  @param number 减掉的消息未读数
+ *  @param tag    消息标示, 用于回调
+ *  @param errPtr 错误句柄
+ *
+ *  @return 是否发送设置, YES是, NO否
+ */
+- (BOOL)wchatMinusUnreadNumber:(NSInteger)number
+                       withTag:(NSInteger)tag
+                         error:(NSError **)errPtr;
+```
 
 
 #### 10.获取文件
 
-	/**
-	 *  @brief 根据文件id获取文件, 分片获取
-	 *
-	 *  @param fid     文件id
-	 *  @param length  文件长度
-	 *  @param size    分片长度
-	 *  @param tag     消息标示, 用于回调
-	 *  @param index   分片索引
-	 *  @param timeout 调用超时时间
-	 *  @param errPtr  错误句柄
-	 *
-	 *  @return 是否开始获取, YES是, NO否
-	 */
-	- (BOOL)wchatGetFile:(NSString *)fid
-	          filelength:(UInt64)length
-	           pieceSize:(UInt32)size
-	             withTag:(NSInteger)tag
-	               index:(UInt32)index
-	         withTimeout:(NSTimeInterval)timeout
-	               error:(NSError **)errPtr;
-	
-	/**
-	 *  @brief 根据文件id获取文件
-	 *
-	 *  @param fid     文件id
-	 *  @param length  文件长度
-	 *  @param tag     消息标示, 用于回调
-	 *  @param timeout 调用超时时间
-	 *  @param errPtr  错误句柄
-	 *
-	 *  @return 是否开始获取, YES是, NO否
-	 */
-	- (BOOL)wchatGetFile:(NSString *)fid
-	          filelength:(UInt64)length
-	             withTag:(NSInteger)tag
-	         withTimeout:(NSTimeInterval)timeout
-	               error:(NSError **)errPtr;
-	               
-	此方法可以调用游云API短链接请求，请求结果已block()的方式返回。
-	/**
-	 *  异步短连请求
-	 *
-	 *  @param method     POST/GET
-	 *  @param url        短链接URL
-	 *  @param params     参数(para1=%@&param2=%d)
-	 *  @param callbackId 回调ID
-	 *  @param timeout    超时时间
-	 *  @param handler    回调结果
-	 */
-	- (void)wchatAsyncRequest:(NSString*)method
-	                      url:(NSString *)url
-	                   params:(NSString *)params
-	               callbackId:(NSInteger)callbackId
-	                  timeout:(NSTimeInterval)timeout
-	               completion:(void (^)(NSDictionary *json, NSError *error))handler;
-	               
+```objective-c
+/**
+ *  @brief 根据文件id获取文件, 分片获取
+ *
+ *  @param fid     文件id
+ *  @param length  文件长度
+ *  @param size    分片长度
+ *  @param tag     消息标示, 用于回调
+ *  @param index   分片索引
+ *  @param timeout 调用超时时间
+ *  @param errPtr  错误句柄
+ *
+ *  @return 是否开始获取, YES是, NO否
+ */
+- (BOOL)wchatGetFile:(NSString *)fid
+          filelength:(UInt64)length
+           pieceSize:(UInt32)size
+             withTag:(NSInteger)tag
+               index:(UInt32)index
+         withTimeout:(NSTimeInterval)timeout
+               error:(NSError **)errPtr;
+
+/**
+ *  @brief 根据文件id获取文件
+ *
+ *  @param fid     文件id
+ *  @param length  文件长度
+ *  @param tag     消息标示, 用于回调
+ *  @param timeout 调用超时时间
+ *  @param errPtr  错误句柄
+ *
+ *  @return 是否开始获取, YES是, NO否
+ */
+- (BOOL)wchatGetFile:(NSString *)fid
+          filelength:(UInt64)length
+             withTag:(NSInteger)tag
+         withTimeout:(NSTimeInterval)timeout
+               error:(NSError **)errPtr;
+```
+
 #### 11.工具辅助方法
 
-	/**
-	 *  @brief 加密数据
-	 *
-	 *  @param string 需要加密的字符串
-	 *
-	 *  @return 加密后的密文
-	 */
-	+ (NSString *)wchatGetAuthString:(NSString *)string;
-	
-	/**
-	 *  @brief 解析pb数据
-	 *
-	 *  @param PBData pb数据
-	 *
-	 *  @return 解析后的数据
-	 */
-	+ (NSArray *)PBdecode:(NSData *)PBData;
-	
-	/**
-	 *  @brief 获取http request X-WVersion 头字段信息 (必须先初始化实例)
-	 *
-	 *  @return 指定格式的头字段信息
-	 */
-	- (NSString *)getXWVersion;
-	
-	/**
-	 *  @brief 获取当前设备udid
-	 *
-	 *  @return 设备唯一标识
-	 */
-	+ (NSString *)getUDID;
-	
-	/**
-	 *  @brief 获取wchat的端口
-	 *
-	 *  @return 端口号
-	 */
-	- (NSInteger)getwchatPort;
-	
-	/**
-	 *  @brief 设置mediasdk的端口
-	 *
-	 *  @param port 端口号
-	 */
-	- (void)setSipMediaPort:(NSInteger)port;
-	
+```objective-c
+/**
+ *  @brief 加密数据
+ *
+ *  @param string 需要加密的字符串
+ *
+ *  @return 加密后的密文
+ */
++ (NSString *)wchatGetAuthString:(NSString *)string;
+
+/**
+ *  @brief 解析pb数据
+ *
+ *  @param PBData pb数据
+ *
+ *  @return 解析后的数据
+ */
++ (NSArray *)PBdecode:(NSData *)PBData;
+
+/**
+ *  @brief 获取http request X-WVersion 头字段信息 (必须先初始化实例)
+ *
+ *  @return 指定格式的头字段信息
+ */
+- (NSString *)getXWVersion;
+
+/**
+ *  @brief 获取当前设备udid
+ *
+ *  @return 设备唯一标识
+ */
++ (NSString *)getUDID;
+
+/**
+ *  @brief 获取wchat的端口
+ *
+ *  @return 端口号
+ */
+- (NSInteger)getwchatPort;
+
+/**
+ *  @brief 设置mediasdk的端口
+ *
+ *  @param port 端口号
+ */
+- (void)setSipMediaPort:(NSInteger)port;
+```
+
 #### 12.多人会议(conference)接口
 
-	/**
-	 *  @brief 请求一个会话房间
-	 *
-	 *  @param GroupID 群组id
-	 *  @param myuid   当前用户uid
-	 *  @param errPtr  错误句柄
-	 *
-	 *  @return 请求是否发送成功, YES是, NO否
-	 */
-	- (BOOL)wchatConferenceRequestRoomWithGroupID:(NSString *)GroupID
-	                                        myuid:(NSString *)myuid
-	                                        error:(NSError **)errPtr;
-	
-	/**
-	 *  @brief 邀请当前群用户加入多人会话房间
-	 *
-	 *  @param users   用户ids
-	 *  @param groupID 群组id
-	 *  @param roomID  房间id
-	 *  @param key     房间key
-	 *  @param errPtr  错误句柄
-	 *
-	 *  @return 请求是否发送成功, YES是, NO否
-	 */
-	- (BOOL)wchatConferenceInviteUsers:(NSArray *)users
-	                           groupID:(NSString *)groupID
-	                            roomID:(NSString *)roomID
-	                               key:(NSString *)key
-	                             error:(NSError **)errPtr;
-	
-	/**
-	 *  @brief 获取电话会议里当前的成员
-	 *
-	 *  @param roomID  房间id
-	 *  @param groupID 群组id
-	 *  @param errPtr  错误句柄
-	 *
-	 *  @return 请求是否发送成功, YES是, NO否
-	 */
-	- (BOOL)wchatConferenceFetchUsersinRoom:(NSString *)roomID
-	                                groupID:(NSString *)groupID
-	                                  error:(NSError **)errPtr;
-	
-	/**
-	 *  @brief  踢出一个或多个成员
-	 *
-	 *  @param users  用户ids
-	 *  @param roomID 房间id
-	 *  @param errPtr 错误句柄
-	 *
-	 *  @return 请求是否发送成功, YES是, NO否
-	 */
-	- (BOOL)wchatConferenceKickUsers:(NSArray *)users
-	                          roomID:(NSString *)roomID
-	                           error:(NSError **)errPtr;
-	
-	/**
-	 *	@brief	禁言一个或多个成员
-	 *
-	 *  @param users  用户ids
-	 *  @param roomID 房间id
-	 *  @param errPtr 错误句柄
-	 *
-	 *  @return 请求是否发送成功, YES是, NO否
-	 */
-	- (BOOL)wchatConferenceMuteUsers:(NSArray *)users
-	                          roomID:(NSString *)roomID
-	                           error:(NSError **)errPtr;
-	
-	/**
-	 *	@brief	解禁一个或多个成员
-	 *
-	 *  @param users  用户ids
-	 *  @param roomID 房间id
-	 *  @param errPtr 错误句柄
-	 *
-	 *  @return 请求是否发送成功, YES是, NO否
-	 */
-	- (BOOL)wchatConferenceUnmuteUsers:(NSArray *)users
-	                            roomID:(NSString *)roomID
-	                             error:(NSError **)errPtr;
+```objective-c
+/**
+ *  @brief 请求一个会话房间
+ *
+ *  @param GroupID 群组id
+ *  @param myuid   当前用户uid
+ *  @param errPtr  错误句柄
+ *
+ *  @return 请求是否发送成功, YES是, NO否
+ */
+- (BOOL)wchatConferenceRequestRoomWithGroupID:(NSString *)GroupID
+                                        myuid:(NSString *)myuid
+                                        error:(NSError **)errPtr;
+
+/**
+ *  @brief 邀请当前群用户加入多人会话房间
+ *
+ *  @param users   用户ids
+ *  @param groupID 群组id
+ *  @param roomID  房间id
+ *  @param key     房间key
+ *  @param errPtr  错误句柄
+ *
+ *  @return 请求是否发送成功, YES是, NO否
+ */
+- (BOOL)wchatConferenceInviteUsers:(NSArray *)users
+                           groupID:(NSString *)groupID
+                            roomID:(NSString *)roomID
+                               key:(NSString *)key
+                             error:(NSError **)errPtr;
+
+/**
+ *  @brief 获取电话会议里当前的成员
+ *
+ *  @param roomID  房间id
+ *  @param groupID 群组id
+ *  @param errPtr  错误句柄
+ *
+ *  @return 请求是否发送成功, YES是, NO否
+ */
+- (BOOL)wchatConferenceFetchUsersinRoom:(NSString *)roomID
+                                groupID:(NSString *)groupID
+                                  error:(NSError **)errPtr;
+
+/**
+ *  @brief  踢出一个或多个成员
+ *
+ *  @param users  用户ids
+ *  @param roomID 房间id
+ *  @param errPtr 错误句柄
+ *
+ *  @return 请求是否发送成功, YES是, NO否
+ */
+- (BOOL)wchatConferenceKickUsers:(NSArray *)users
+                          roomID:(NSString *)roomID
+                           error:(NSError **)errPtr;
+
+/**
+ *	@brief	禁言一个或多个成员
+ *
+ *  @param users  用户ids
+ *  @param roomID 房间id
+ *  @param errPtr 错误句柄
+ *
+ *  @return 请求是否发送成功, YES是, NO否
+ */
+- (BOOL)wchatConferenceMuteUsers:(NSArray *)users
+                          roomID:(NSString *)roomID
+                           error:(NSError **)errPtr;
+
+/**
+ *	@brief	解禁一个或多个成员
+ *
+ *  @param users  用户ids
+ *  @param roomID 房间id
+ *  @param errPtr 错误句柄
+ *
+ *  @return 请求是否发送成功, YES是, NO否
+ */
+- (BOOL)wchatConferenceUnmuteUsers:(NSArray *)users
+                            roomID:(NSString *)roomID
+                             error:(NSError **)errPtr;
+```
+
+#### 13. 数据统计
+
+SDK需要开发者调用一些接口来完善数据统计，如果开发者不需要游云平台的数据统计、可以忽略此功能。
+
+```objective-c
+/**
+ *  统计信息
+ *
+ *  @param userName  用户昵称
+ *  @param url       用户头像地址
+ *  @param longitude 经度
+ *  @param latitude  纬度
+ *  @param code      省区号码
+ */
+- (void)recordEventWithName:(NSString *)userName
+                    iconURL:(NSString *)url
+                  longitude:(double)longitude
+                   latitude:(double)latitude
+               provinceCode:(NSString *)code;
+/**
+ *  统计用户点击push消息启动应用
+ *
+ *  @param launchOptions 应用启动信息
+ */
+- (void)didFinishLaunchingWithOptions:(NSDictionary *)launchOptions;
+/**
+ *  统计app活跃时用户点击push消息
+ *
+ *  @param notification 点击的push消息
+ */
+- (void)didReceiveRemoteNotifications:(NSDictionary *)notification;
+```
 
 
 
-## 3. SDK代理回调
+#SDK代理回调
 
 #### @required
 
@@ -607,7 +619,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	- (void)onwchatAuth:(WChatSDK *)instance
 	           userinfo:(NSDictionary *)userinfo
 	          withError:(NSError *)error;
-	          
+
 #### @optional
 
 #### 1.连接状态回调
@@ -663,7 +675,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	 *  @param state    连接状态
 	 */
 	- (void)onConnectState:(WChatSDK *)instance
-	                 state:(int)state;
+	                 state:(WChatConnectState)state;
 
 #### 2.前后台切换
 
@@ -697,7 +709,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	 */
 	- (void)onSendPreBack:(WChatSDK *)instance
 	              withTag:(NSInteger)tag;
-
+	
 	/**
 	 *  @brief 发送文本消息回调
 	 *
@@ -754,22 +766,22 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
     -(void)onUnreadNoticeCallback:(WChatSDK*)instance withCallbackId:(NSInteger)callbackId;
     
     /**
-	 *  @brief 获取消息未读数
-	 *
-	 *  @param user  用户消息未读数, 字典格式 @{ @"用户id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 }, @"用户id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 } }
-	 *  @param group 群组消息未读数, 字典格式 @{ @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 }, @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 } }
-	 */
-	- (void)onRecvUnreadNumber:(WChatSDK *)instance
-	                  withUser:(NSDictionary *)user
-	                 withGroup:(NSDictionary *)group;
-	
-	/**
-	 *  @brief 获取屏蔽群组消息未读数
-	 *
-	 *  @param group 群组消息未读数, 字典格式 @{ @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 }, @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 } }
-	 */
-	- (void)onRecvUnreadNumber:(WChatSDK *)instance
-	            withBlockGroup:(NSDictionary *)group;
+     *  @brief 获取消息未读数
+     *
+     *  @param user  用户消息未读数, 字典格式 @{ @"用户id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 }, @"用户id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 } }
+     *  @param group 群组消息未读数, 字典格式 @{ @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 }, @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 } }
+     */
+    - (void)onRecvUnreadNumber:(WChatSDK *)instance
+                      withUser:(NSDictionary *)user
+                     withGroup:(NSDictionary *)group;
+    
+    /**
+     *  @brief 获取屏蔽群组消息未读数
+     *
+     *  @param group 群组消息未读数, 字典格式 @{ @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 }, @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 } }
+     */
+    - (void)onRecvUnreadNumber:(WChatSDK *)instance
+                withBlockGroup:(NSDictionary *)group;
 
 #### 4.接收文本, 语音, 文件, notice, 订阅消息回调
 
@@ -795,7 +807,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	          content:(NSData *)content
 	          extBody:(NSData *)extContent
 	        withError:(NSError *)error;
-
+	
 	/**
 	 *  @brief 接收群组文本消息回调
 	 *
@@ -818,7 +830,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	               content:(NSData *)content
 	               extBody:(NSData *)extContent
 	             withError:(NSError *)error;
-	             
+
 #### 5.接收语音
 
 	/**
@@ -845,7 +857,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	            content:(NSData *)content
 	            extBody:(NSData *)extContent
 	          withError:(NSError *)error;
-
+	
 	/**
 	 *  @brief 接收群组语音消息回调
 	 *
@@ -981,7 +993,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	                   content:(NSData *)content
 	                   extBody:(NSData *)extContent
 	                 withError:(NSError *)error;
-	             
+
 #### 8.接收聊天室消息
 
 	/**
@@ -1048,7 +1060,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	             withIndex:(UInt32)index
 	             withLimit:(UInt32)limit
 	             withError:(NSError *)error;
-	             
+
 #### 10.多人会话
 
 	/**
@@ -1128,7 +1140,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	 **/
 	-(void)liveHostLeaveWithUidRoomidDic:(NSDictionary *)dic;
 
-## 4. 群组业务接口
+# 群组业务接口
 
 #### 1.群组 - 管理相关接口
 
@@ -1140,19 +1152,6 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
     -(void)createGroupWithCompletionHandler:(void(^)(NSString *groupId, NSError* requestError))handler;
     
     /**
-	 *  创建一个条件群组
-	 *
-	 *  @param name    群名称
-	 *  @param desc    群简介
-	 *  @param cate    群类别
-	 *  @param handler 回调
-	 */
-	- (void)groupCreateName:(NSString *)name
-	            description:(NSString *)desc
-	               categary:(WChatGroupCategary)cate
-	             completion:(void (^)(NSDictionary *response, NSError *err))handler;
-
-    /**
      *  群组加人
      *
      *  @param groupId 群组id
@@ -1160,7 +1159,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
      *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
      */
     -(void)group:(NSString *)groupId addUser:(NSArray *)userIds completionHandler:(void (^)(BOOL isAdd, NSError* requestError))handler;
-
+    
     /**
      *  群组踢人
      *
@@ -1169,7 +1168,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
      *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
      */
     -(void)group:(NSString *)groupId delUser:(NSArray *)userIds completionHandler:(void (^)(BOOL isDel, NSError* requestError))handler;
-
+    
     /**
      *  退出群组
      *
@@ -1177,7 +1176,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
      *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
      */
     -(void)exitGroup:(NSString *)groupId CompletionHandler:(void(^)(BOOL isExit, NSError* requestError))handler;
-
+    
     /**
      *  获取群组成员
      *
@@ -1185,54 +1184,13 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
      *  @param handler 回调block (群组成员数据, 如果错误则返回错误信息)
      */
     -(void)getGroupUsers:(NSString *)groupId completionHandler:(void (^)(NSArray *users, NSError* requestError))handler;
-
+    
     /**
      *  获取当前用户的群组
      *
      *  @param handler 回调block (用户的群组数据, 如果错误则返回错误信息)
      */
     -(void)getUserGroupsWithCompletionHandler:(void (^)(NSArray *groups, NSError* requestError))handler;
-    
-	/**
-	 *  获取群组内的所有成员
-	 *
-	 *  @param gid     群id
-	 *  @param handler 回调
-	 */
-	- (void)groupGetMember:(NSString *)gid completion:(void (^)(NSArray *members, NSError *err))handler;
-	/**
-	 *  销毁房间
-	 *
-	 *  @param gid     房间ID
-	 *  @param handler 回调
-	 */
-	- (void)groupDelete:(NSString *)gid completion:(void (^)(BOOL sucess, NSError *err))handler;
-	/**
-	 *  获取群信息
-	 *
-	 *  @param gid     群组ID
-	 *  @param handler 回调
-	 */
-	- (void)groupGetInfo:(NSString *)gid completion:(void (^)(NSDictionary *response, NSError *err))handler;
-	/**
-	 *  更新群组信息
-	 *
-	 *  @param gid     群ID
-	 *  @param name    群名称
-	 *  @param desc    群简介
-	 *  @param cate    群类别
-	 *  @param handler 回调
-	 */
-	- (void)groupUpdate:(NSString *)gid name:(NSString *)name description:(NSString *)desc categary:(WChatGroupCategary)cate completion:(void (^)(NSDictionary *response, NSError *err))handler;
-	/**
-	 *  申请加入群组
-	 *
-	 *  @param gid        群组ID
-	 *  @param extContent 附言
-	 *  @param handler    回调
-	 */
-	- (void)groupApplyJoinin:(NSString *)gid extContent:(NSString *)extContent completion:(void (^)(BOOL success, NSError *err))handler;
-	
 
 #### 2.黑名单相关接口
 
@@ -1243,7 +1201,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
      *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
      */
     -(void)blacklistAddUser:(NSString *)userId completionHandler:(void (^)(BOOL isAdd, NSError* requestError))handler;
-
+    
     /**
      *  黑名单删除用户.
      *
@@ -1251,7 +1209,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
      *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
      */
     -(void)blacklistDelUser:(NSString *)userId completionHandler:(void (^)(BOOL isDel, NSError* requestError))handler;
-
+    
     /**
      *  当前用户黑名单
      *
@@ -1270,7 +1228,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
      *  @param handler   回调block (历史消息数据, 如果错误则返回错误信息)
      */
     -(void)getHistoryByUser:(NSString *)userId timestamp:(NSInteger)timestamp size:(NSInteger)size completionHandler:(void (^)(NSArray *history, NSError* requestError))handler;
-
+    
     /**
      *  群聊聊天历史消息
      *
@@ -1290,7 +1248,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
      *  @param handler   回调block (是否操作成功, 如果错误则返回错误信息)
      */
     -(void)deviceRegisterPush:(NSString *)pushToken completionHandler:(void (^)(BOOL isRegister, NSError* requestError))handler;
-
+    
     /**
      *  当前设备注册推送. push时段
      *
@@ -1300,7 +1258,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
      *  @param handler   回调block (是否操作成功, 如果错误则返回错误信息)
      */
     -(void)deviceRegisterPush:(NSString *)pushToken pushStartTime:(NSInteger)startTime endTime:(NSInteger)endTime completionHandler:(void (^)(BOOL isRegister, NSError* requestError))handler;
-
+    
     /**
      *  获取设备信息.
      *
@@ -1309,9 +1267,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
     -(void)deviceInfoWithCompletionHandler:(void (^)(NSDictionary *deviceInfo, NSError* requestError))handler;
 
 
-## 5. 聊天室业务接口
-
-此接口用户聊天室相关业务。
+# 聊天室业务接口
 
 	/**
 	 *  创建聊天室群租
@@ -1332,25 +1288,27 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	- (void)chatRoomDelete:(NSString *)roomid
 	            completion:(void (^)(BOOL success, NSError *err))handler;
 	
-    /**
-     *  进入聊天室房间
-     *
-     *  @param roomid  聊天室房间ID
-     *  @param alias   别名(接入方的用户ID，用来和游云ID做映射)
-     *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
-     */
-    - (void)chatRoomEnter:(NSString *)roomid
-                  aliasid:(NSString *)alias
-               completion:(void(^)(BOOL isEnter, NSError *err))handler;
+	/**
+	 *  进入聊天室房间
+	 *
+	 *  @param roomid  聊天室房间ID
+	 *  @param alias   别名(接入方的用户ID，用来和游云ID做映射)
+	 *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
+	 */
+	- (void)chatRoomEnter:(NSString *)roomid
+	              aliasid:(NSString *)alias
+	           completion:(void(^)(BOOL isEnter, NSError *err))handler;
 
-	
+
 	/**
 	 *  退出聊天室房间
 	 *
 	 *  @param roomid  聊天室房间ID
+	 *  @param alias   别名(接入方的用户ID，用来和游云ID做映射)
 	 *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
 	 */
-	- (void)chatRoomExit:(NSString *)roomid
+	- (void)chatRoomExit:(NSString *)roomid 
+	             aliasid:(NSString *)alias
 	          completion:(void(^)(BOOL isExit, NSError *err))handler;
 	
 	/**
@@ -1390,7 +1348,7 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	 *  聊天室聊天历史消息
 	 *
 	 *  @param roomid    群组id
-	 *  @param timestamp 时间戳(精确到秒)
+	 *  @param timestamp 时间戳(精确到秒,如果传-1，获取最新消息)
 	 *  @param size      数据条数(服务器默认一次最多取20)
 	 *  @param handler   回调block (历史消息数据, 如果错误则返回错误信息)
 	 *					  结果倒叙(新消息arr[0],就消息arr[1])
@@ -1399,4 +1357,3 @@ SDK 在 iOS9 上需要使用 http，您需要设置在 App 中使用 http。在 
 	                timestamp:(NSInteger)timestamp
 	                     size:(NSInteger)size
 	        completionHandler:(void (^)(NSArray *response, NSError *err))handler;
-	                

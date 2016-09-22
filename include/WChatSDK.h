@@ -41,10 +41,10 @@
  *  @param secret         开放平台下发的sectet
  *  @param clientDelegate 回调代理
  */
--(void)registerApp:(NSString *)appUDID
-          clientId:(NSString *)clientId
-            secret:(NSString *)secret
-          delegate:(id<WChatSDKDelegate>)clientDelegate;
+- (void)registerApp:(NSString *)appUDID
+           clientId:(NSString *)clientId
+             secret:(NSString *)secret
+           delegate:(id<WChatSDKDelegate>)clientDelegate;
 
 /**
  *  @brief 测试平台, 注册设备
@@ -54,10 +54,10 @@
  *  @param secret         开放平台下发的sectet
  *  @param clientDelegate 回调代理
  */
--(void)testRegisterApp:(NSString *)appUDID
-              clientId:(NSString *)clientId
-                secret:(NSString *)secret
-              delegate:(id<WChatSDKDelegate>)clientDelegate;
+- (void)testRegisterApp:(NSString *)appUDID
+               clientId:(NSString *)clientId
+                 secret:(NSString *)secret
+               delegate:(id<WChatSDKDelegate>)clientDelegate;
 
 
 /**
@@ -258,6 +258,14 @@
 
 #pragma mark - 发送文件消息接口
 /**
+ *  获取发送文件的文件ID
+ *
+ *  @param targetID 对方的ID
+ *
+ *  @return 文件ID
+ */
+- (NSString *)getFileIdWithTargetID:(NSString *)targetID;
+/**
  *  @brief 发送文件给个人、群组
  *
  *  @param toid       收消息人、群组、聊天室id
@@ -363,7 +371,7 @@
 
 #pragma mark - 消息未读数设置
 /**
- *  @brief 设置消息未读数
+ *  @brief 设置消息未读数(长链接)
  *
  *  @param number 未读数数量
  *  @param tag    消息标示, 用于回调
@@ -378,7 +386,7 @@
 /**
  *  @brief 设置消息未读数 - number
  *
- *  @param number 减掉的消息未读数
+ *  @param number 减掉的消息未读数(长链接)
  *  @param tag    消息标示, 用于回调
  *  @param errPtr 错误句柄
  *
@@ -387,6 +395,22 @@
 - (BOOL)wchatMinusUnreadNumber:(NSInteger)number
                        withTag:(NSInteger)tag
                          error:(NSError **)errPtr;
+/**
+ *  @brief 设置消息的未读数量(短链接)
+ *
+ *  @param number  用户还剩的消息未读数
+ *  @param handler 回调
+ */
+- (void)wchatSetMsgUnreadNumber:(NSInteger)number
+                     completion:(void (^)(BOOL success, NSError *err))handler;
+/**
+ *  @brief 设置消息减少的未读数量(短链接)
+ *
+ *  @param number  要减少的未读数
+ *  @param handler 回调
+ */
+- (void)wchatReduceMsgUnreadNumber:(NSInteger)number
+                        completion:(void (^)(BOOL success, NSError *err))handler;
 
 #pragma mark - 获取文件
 /**
@@ -631,6 +655,33 @@
                             roomID:(NSString *)roomID
                              error:(NSError **)errPtr;
 
+#pragma mark - Statistics
+/**
+ *  统计信息
+ *
+ *  @param userName  用户昵称
+ *  @param url       用户头像地址
+ *  @param longitude 经度
+ *  @param latitude  纬度
+ *  @param code      省区号码
+ */
+- (void)recordEventWithName:(NSString *)userName
+                    iconURL:(NSString *)url
+                  longitude:(double)longitude
+                   latitude:(double)latitude
+               provinceCode:(NSString *)code;
+/**
+ *  统计用户点击push消息启动应用
+ *
+ *  @param launchOptions 应用启动信息
+ */
+- (void)didFinishLaunchingWithOptions:(NSDictionary *)launchOptions;
+/**
+ *  统计app活跃时用户点击push消息
+ *
+ *  @param notification 点击的push消息
+ */
+- (void)didReceiveRemoteNotifications:(NSDictionary *)notification;
 
 @end
 
@@ -657,7 +708,7 @@
  *
  *  @param instance 实例
  */
-- (void)onConnected: (WChatSDK *)instance;
+- (void)onConnected:(WChatSDK *)instance;
 
 /**
  *  @brief 连接断开回调
@@ -725,7 +776,7 @@
  *  @param state    连接状态
  */
 - (void)onConnectState:(WChatSDK *)instance
-                 state:(int)state;
+                 state:(WChatConnectState)state;
 
 #pragma mark - 发送消息回调
 /**
@@ -1259,5 +1310,6 @@
  **/
 - (void)onUnreadNoticeCallback:(WChatSDK *)instance
                 withCallbackId:(NSInteger)callbackId;
+
 
 @end

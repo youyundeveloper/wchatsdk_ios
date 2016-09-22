@@ -102,22 +102,24 @@ typedef NS_ENUM(NSInteger, WChatRoomRoleType) {
  *  @param uids      游云成员ID列表
  *  @param roomid    聊天室房间ID
  *  @param isForbid  1：禁言(默认)，0：解禁言
+ *  @param time      禁言时间(默认15分钟)单位分钟
  *  @param handler   回调结果
  */
 - (void)chatRoomForbidUser:(NSArray *)uids
                     roomid:(NSString *)roomid
                     forbid:(int)isForbid
+                forbidTime:(NSInteger)time
                 completion:(void (^)(BOOL success, NSError *err))handler;
 
 /**
  *  聊天室聊天历史消息
  *
  *  @param roomid    群组id
- *  @param timestamp 时间戳(精确到秒)
+ *  @param timestamp 时间戳(精确到秒,，如果传-1，获取最新消息)
  *  @param size      数据条数(服务器默认一次最多取20)
  *  @param handler   回调block (历史消息数据, 如果错误则返回错误信息)
  */
--(void)chatRoomGetHistory:(NSString *)roomid
+- (void)chatRoomGetHistory:(NSString *)roomid
                 timestamp:(NSInteger)timestamp
                      size:(NSInteger)size
         completionHandler:(void (^)(NSArray *response, NSError *err))handler;

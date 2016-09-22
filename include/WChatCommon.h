@@ -12,7 +12,7 @@
 #define WChatErrorDomain @"WChatErrorDomain"
 
 //sdk版本
-#define WChatVersion @"3.9.0"
+#define WChatVersion @"3.9.2"
 
 //平台切换宏
 typedef NS_ENUM(NSInteger, WChatPlatform) {
@@ -66,6 +66,7 @@ typedef NS_ENUM(NSInteger, YYWChatFileType)
     
     YYWChatFileTypeTextExt   = 0x0a,  // SDK文本扩展使用
     YYWChatFileTypeCustom    = 0x0b,  // 自定义消息
+    YYWChatFileTypeEmotion   = 0x0c,  // 表情
 
     YYWChatFileTypeHtml      = 0x10,
     YYWChatFileTypeMixed     = 0x11,  //JSON
@@ -136,6 +137,7 @@ typedef NS_ENUM(NSInteger, WChatConnectState) {
     Receiving       = 3,    //正在获取消息
     Connecting      = 4,    //连接中
     SystemConfig    = 5,    //系统设置(服务器返回,需要客户端处理,如多设备登陆,强制升级)
+    UnReconnect     = 6,    //不再重连
 
 };//连接状态
 
