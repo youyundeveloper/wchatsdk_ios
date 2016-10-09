@@ -609,751 +609,841 @@ SDK需要开发者调用一些接口来完善数据统计，如果开发者不�
 
 #### @required
 
-	/**
-	 *  @brief 认证回调, 必须实现
-	 *
-	 *  @param instance 实例
-	 *  @param userinfo 认证成功, 返回用户信息
-	 *  @param error    认证失败, 返回错误信息
-	 */
-	- (void)onwchatAuth:(WChatSDK *)instance
-	           userinfo:(NSDictionary *)userinfo
-	          withError:(NSError *)error;
+```objective-c
+/**
+ *  @brief 认证回调, 必须实现
+ *
+ *  @param instance 实例
+ *  @param userinfo 认证成功, 返回用户信息
+ *  @param error    认证失败, 返回错误信息
+ */
+- (void)onwchatAuth:(WChatSDK *)instance
+           userinfo:(NSDictionary *)userinfo
+          withError:(NSError *)error;
+```
 
 #### @optional
 
 #### 1.连接状态回调
-	/**
-	 *  @brief 连接成功回调
-	 *
-	 *  @param instance 实例
-	 */
-	- (void)onConnected: (WChatSDK *)instance;
-	
-	/**
-	 *  @brief 连接断开回调
-	 *
-	 *  @param instance 实例
-	 *  @param error    如连接出错断开, 则返回错误消息
-	 */
-	- (void)onDisconnect:(WChatSDK *)instance
-	           withError:(NSError *)error;
-	
-	/**
-	 *  @brief 向服务器发送断开连接的消息回调
-	 *
-	 *  @param instance 实例
-	 *  @param error    如果设置失败, 则返回错误信息
-	 */
-	- (void)onClose:(WChatSDK *)instance
-	      withError:(NSError *)error;
-	
-	/**
-	 *  @brief 退出登陆回调
-	 *
-	 *  @param instance 实例
-	 *  @param error    如登陆出错, 则返回错误消息
-	 */
-	- (void)onLogout:(WChatSDK *)instance
-	       withError:(NSError *)error;
-	
-	/**
-	 *  @brief 超时回调
-	 *
-	 *  @param instance 实例
-	 *  @param tag      消息标示
-	 *  @param error    如操作超时, 则返回错误消息
-	 */
-	- (void)onTimeout:(WChatSDK *)instance
-	          withTag:(NSInteger)tag
-	        withError:(NSError *)error;
-	        
-	/**
-	 *  @brief 连接状态回调
-	 *
-	 *  @param instance 实例
-	 *  @param state    连接状态
-	 */
-	- (void)onConnectState:(WChatSDK *)instance
-	                 state:(WChatConnectState)state;
+```objective-c
+/**
+ *  @brief 连接成功回调
+ *
+ *  @param instance 实例
+ */
+- (void)onConnected: (WChatSDK *)instance;
+
+/**
+ *  @brief 连接断开回调
+ *
+ *  @param instance 实例
+ *  @param error    如连接出错断开, 则返回错误消息
+ */
+- (void)onDisconnect:(WChatSDK *)instance
+           withError:(NSError *)error;
+
+/**
+ *  @brief 向服务器发送断开连接的消息回调
+ *
+ *  @param instance 实例
+ *  @param error    如果设置失败, 则返回错误信息
+ */
+- (void)onClose:(WChatSDK *)instance
+      withError:(NSError *)error;
+
+/**
+ *  @brief 退出登陆回调
+ *
+ *  @param instance 实例
+ *  @param error    如登陆出错, 则返回错误消息
+ */
+- (void)onLogout:(WChatSDK *)instance
+       withError:(NSError *)error;
+
+/**
+ *  @brief 超时回调
+ *
+ *  @param instance 实例
+ *  @param tag      消息标示
+ *  @param error    如操作超时, 则返回错误消息
+ */
+- (void)onTimeout:(WChatSDK *)instance
+          withTag:(NSInteger)tag
+        withError:(NSError *)error;
+        
+/**
+ *  @brief 连接状态回调
+ *
+ *  @param instance 实例
+ *  @param state    连接状态
+ */
+- (void)onConnectState:(WChatSDK *)instance
+                 state:(WChatConnectState)state;
+```
 
 #### 2.前后台切换
 
-	/**
-	 *  @brief 客户端退到后台, 关闭服务器消息notice下发, 开启推送回调
-	 *
-	 *  @param instance 实例
-	 *  @param error    如果设置失败, 则返回错误信息
-	 */
-	- (void)onPreClose:(WChatSDK *)instance
-	         withError:(NSError *)error;
-	
-	/**
-	 *  @brief 客户端回到前台, 开启服务器消息notice下发, 关闭推送
-	 *
-	 *  @param instance 实例
-	 *  @param error    如果设置失败, 则返回错误信息
-	 */
-	- (void)onKeepAlive:(WChatSDK *)instance
-	          withError:(NSError *)error;
+```objective-c
+/**
+ *  @brief 客户端退到后台, 关闭服务器消息notice下发, 开启推送回调
+ *
+ *  @param instance 实例
+ *  @param error    如果设置失败, 则返回错误信息
+ */
+- (void)onPreClose:(WChatSDK *)instance
+         withError:(NSError *)error;
+
+/**
+ *  @brief 客户端回到前台, 开启服务器消息notice下发, 关闭推送
+ *
+ *  @param instance 实例
+ *  @param error    如果设置失败, 则返回错误信息
+ */
+- (void)onKeepAlive:(WChatSDK *)instance
+          withError:(NSError *)error;
+```
 
 
 #### 2.发送消息回调
 
-	/**
-	 *  @brief 消息已送达到服务器, 但服务器还未下发相应, sdk预先返回, 随后服务器会下发相应, 以及时间戳.
-	 *  可理解为发送消息成功, 前端可根据此状态, 预先显示消息发送成功, 后台处理服务器下发.
-	 *
-	 *  @param instance 实例
-	 *  @param tag      消息标示
-	 */
-	- (void)onSendPreBack:(WChatSDK *)instance
-	              withTag:(NSInteger)tag;
-	
-	/**
-	 *  @brief 发送文本消息回调
-	 *
-	 *  @param instance  实例
-	 *  @param tag       消息标示
-	 *  @param time      消息时间
-	 *  @param messageId 消息id
-	 *  @param error     如发送出错, 则返回错误消息
-	 */
-	- (void)onSendMsg:(WChatSDK *)instance
-	          withTag:(NSInteger)tag
-	         withTime:(NSInteger)time
-	    withMessageId:(NSString *)messageId
-	        withError:(NSError *)error;
-	
-	/**
-	 *  @brief 发送文件回调
-	 *
-	 *  @param instance  实例
-	 *  @param tag       消息标示
-	 *  @param time      消息时间
-	 *  @param messageId 消息id
-	 *  @param error     如发送出错, 则返回错误消息
-	 */
-	- (void)onSendFile:(WChatSDK *)instance
-	           withTag:(NSInteger)tag
-	          withTime:(NSInteger)time
-	     withMessageId:(NSString *)messageId
-	         withError:(NSError *)error;
-	
-	/**
-	 *  @brief 转发消息回调
-	 *
-	 *  @param instance  实例
-	 *  @param tag       消息标示
-	 *  @param time      消息时间
-	 *  @param messageId 消息id
-	 *  @param error     如发送出错, 则返回错误消息
-	 */
-	- (void)onForward:(WChatSDK *)instance
-	          withTag:(NSInteger)tag
-	         withTime:(NSInteger)time
-	    withMessageId:(NSString *)messageId
-	        withError:(NSError *)error;
+```objective-c
+/**
+ *  @brief 消息已送达到服务器, 但服务器还未下发相应, sdk预先返回, 随后服务器会下发相应, 以及时间戳.
+ *  可理解为发送消息成功, 前端可根据此状态, 预先显示消息发送成功, 后台处理服务器下发.
+ *
+ *  @param instance 实例
+ *  @param tag      消息标示
+ */
+- (void)onSendPreBack:(WChatSDK *)instance
+              withTag:(NSInteger)tag;
+
+/**
+ *  @brief 发送文本消息回调
+ *
+ *  @param instance  实例
+ *  @param tag       消息标示
+ *  @param time      消息时间
+ *  @param messageId 消息id
+ *  @param error     如发送出错, 则返回错误消息
+ */
+- (void)onSendMsg:(WChatSDK *)instance
+          withTag:(NSInteger)tag
+         withTime:(NSInteger)time
+    withMessageId:(NSString *)messageId
+        withError:(NSError *)error;
+
+/**
+ *  @brief 发送文件回调
+ *
+ *  @param instance  实例
+ *  @param tag       消息标示
+ *  @param time      消息时间
+ *  @param messageId 消息id
+ *  @param error     如发送出错, 则返回错误消息
+ */
+- (void)onSendFile:(WChatSDK *)instance
+           withTag:(NSInteger)tag
+          withTime:(NSInteger)time
+     withMessageId:(NSString *)messageId
+         withError:(NSError *)error;
+
+/**
+ *  @brief 转发消息回调
+ *
+ *  @param instance  实例
+ *  @param tag       消息标示
+ *  @param time      消息时间
+ *  @param messageId 消息id
+ *  @param error     如发送出错, 则返回错误消息
+ */
+- (void)onForward:(WChatSDK *)instance
+          withTag:(NSInteger)tag
+         withTime:(NSInteger)time
+    withMessageId:(NSString *)messageId
+        withError:(NSError *)error;
+```
 
 #### 3.未读数设置回调
 
-    /**
-     *  未读数设置回调
-     *
-     *  @param instance   实例
-     *  @param callbackId 消息标示
-     */
-    -(void)onUnreadNoticeCallback:(WChatSDK*)instance withCallbackId:(NSInteger)callbackId;
-    
-    /**
-     *  @brief 获取消息未读数
-     *
-     *  @param user  用户消息未读数, 字典格式 @{ @"用户id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 }, @"用户id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 } }
-     *  @param group 群组消息未读数, 字典格式 @{ @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 }, @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 } }
-     */
-    - (void)onRecvUnreadNumber:(WChatSDK *)instance
-                      withUser:(NSDictionary *)user
-                     withGroup:(NSDictionary *)group;
-    
-    /**
-     *  @brief 获取屏蔽群组消息未读数
-     *
-     *  @param group 群组消息未读数, 字典格式 @{ @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 }, @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 } }
-     */
-    - (void)onRecvUnreadNumber:(WChatSDK *)instance
-                withBlockGroup:(NSDictionary *)group;
+```objective-c
+/**
+ *  未读数设置回调
+ *
+ *  @param instance   实例
+ *  @param callbackId 消息标示
+ */
+-(void)onUnreadNoticeCallback:(WChatSDK*)instance withCallbackId:(NSInteger)callbackId;
+
+/**
+ *  @brief 获取消息未读数
+ *
+ *  @param user  用户消息未读数, 字典格式 @{ @"用户id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 }, @"用户id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 } }
+ *  @param group 群组消息未读数, 字典格式 @{ @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 }, @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 } }
+ */
+- (void)onRecvUnreadNumber:(WChatSDK *)instance
+                  withUser:(NSDictionary *)user
+                 withGroup:(NSDictionary *)group;
+
+/**
+ *  @brief 获取屏蔽群组消息未读数
+ *
+ *  @param group 群组消息未读数, 字典格式 @{ @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 }, @"群组id": @{ @"num": NSNumber 未读数, @"time": NSNumber 消息时间 } }
+ */
+- (void)onRecvUnreadNumber:(WChatSDK *)instance
+            withBlockGroup:(NSDictionary *)group;
+```
 
 #### 4.接收文本, 语音, 文件, notice, 订阅消息回调
 
-	/**
-	 *  @brief 接收文本消息回调
-	 *
-	 *  @param instance   实例
-	 *  @param messageId  消息id
-	 *  @param fromUid    发消息人Uid
-	 *  @param toUid      收消息人Uid
-	 *  @param type       消息类型
-	 *  @param timevalue  消息时间
-	 *  @param content    消息内容
-	 *  @param extContent 消息扩展内容
-	 *  @param error      如收消息出错, 则返回错误信息
-	 */
-	- (void)onRecvMsg:(WChatSDK *)instance
-	    withMessageId:(NSString *)messageId
-	          fromUid:(NSString *)fromUid
-	            toUid:(NSString *)toUid
-	         filetype:(YYWChatFileType)type
-	             time:(NSInteger)timevalue
-	          content:(NSData *)content
-	          extBody:(NSData *)extContent
-	        withError:(NSError *)error;
-	
-	/**
-	 *  @brief 接收群组文本消息回调
-	 *
-	 *  @param instance   实例
-	 *  @param messageId  消息id
-	 *  @param gid        群id
-	 *  @param fromUid    发消息人Uid
-	 *  @param type       消息类型
-	 *  @param timevalue  消息时间
-	 *  @param content    消息内容
-	 *  @param extContent 消息扩展内容
-	 *  @param error      如收消息出错, 则返回错误信息
-	 */
-	- (void)onRecvGroupMsg:(WChatSDK *)instance
-	         withMessageId:(NSString *)messageId
-	           withGroupId:(NSString *)gid
-	               fromUid:(NSString *)fromUid
-	              filetype:(YYWChatFileType)type
-	                  time:(NSInteger)timevalue
-	               content:(NSData *)content
-	               extBody:(NSData *)extContent
-	             withError:(NSError *)error;
+```objective-c
+/**
+ *  @brief 接收文本消息回调
+ *
+ *  @param instance   实例
+ *  @param messageId  消息id
+ *  @param fromUid    发消息人Uid
+ *  @param toUid      收消息人Uid
+ *  @param type       消息类型
+ *  @param timevalue  消息时间
+ *  @param content    消息内容
+ *  @param extContent 消息扩展内容
+ *  @param error      如收消息出错, 则返回错误信息
+ */
+- (void)onRecvMsg:(WChatSDK *)instance
+    withMessageId:(NSString *)messageId
+          fromUid:(NSString *)fromUid
+            toUid:(NSString *)toUid
+         filetype:(YYWChatFileType)type
+             time:(NSInteger)timevalue
+          content:(NSData *)content
+          extBody:(NSData *)extContent
+        withError:(NSError *)error;
+
+/**
+ *  @brief 接收群组文本消息回调
+ *
+ *  @param instance   实例
+ *  @param messageId  消息id
+ *  @param gid        群id
+ *  @param fromUid    发消息人Uid
+ *  @param type       消息类型
+ *  @param timevalue  消息时间
+ *  @param content    消息内容
+ *  @param extContent 消息扩展内容
+ *  @param error      如收消息出错, 则返回错误信息
+ */
+- (void)onRecvGroupMsg:(WChatSDK *)instance
+         withMessageId:(NSString *)messageId
+           withGroupId:(NSString *)gid
+               fromUid:(NSString *)fromUid
+              filetype:(YYWChatFileType)type
+                  time:(NSInteger)timevalue
+               content:(NSData *)content
+               extBody:(NSData *)extContent
+             withError:(NSError *)error;
+```
 
 #### 5.接收语音
 
-	/**
-	 *  @brief 接收语音消息回调
-	 *
-	 *  @param instance   实例
-	 *  @param messageId  消息id
-	 *  @param fromUid    发消息人Uid
-	 *  @param toUid      收消息人Uid
-	 *  @param spanId     语音唯一标识
-	 *  @param sequenceNo 语音分片编号, 如 1, 2, 3, ... -1, -1 表示结束
-	 *  @param timevalue  消息时间
-	 *  @param content    消息内容
-	 *  @param extContent 消息扩展内容
-	 *  @param error      如收消息出错, 则返回错误信息
-	 */
-	- (void)onRecvVoice:(WChatSDK *)instance
-	      withMessageId:(NSString *)messageId
-	            fromUid:(NSString *)fromUid
-	              toUid:(NSString *)toUid
-	             spanId:(NSString *)spanId
-	         sequenceNo:(NSInteger)sequenceNo
-	               time:(NSInteger)timevalue
-	            content:(NSData *)content
-	            extBody:(NSData *)extContent
-	          withError:(NSError *)error;
-	
-	/**
-	 *  @brief 接收群组语音消息回调
-	 *
-	 *  @param instance   实例
-	 *  @param messageId  消息id
-	 *  @param gid        群id
-	 *  @param fromUid    发消息人Uid
-	 *  @param spanId     语音唯一标识
-	 *  @param sequenceNo 语音分片编号, 如 1, 2, 3, ... -1, -1 表示结束
-	 *  @param timevalue  消息时间
-	 *  @param content    消息内容
-	 *  @param extContent 消息扩展内容
-	 *  @param error      如收消息出错, 则返回错误信息
-	 */
-	- (void)onRecvGroupVoice:(WChatSDK *)instance
-	           withMessageId:(NSString *)messageId
-	             withGroupId:(NSString *)gid
-	                 fromUid:(NSString *)fromUid
-	                  spanId:(NSString *)spanId
-	              sequenceNo:(NSInteger)sequenceNo
-	                    time:(NSInteger)timevalue
-	                 content:(NSData *)content
-	                 extBody:(NSData *)extContent
-	               withError:(NSError *)error;
+```objective-c
+/**
+ *  @brief 接收语音消息回调
+ *
+ *  @param instance   实例
+ *  @param messageId  消息id
+ *  @param fromUid    发消息人Uid
+ *  @param toUid      收消息人Uid
+ *  @param spanId     语音唯一标识
+ *  @param sequenceNo 语音分片编号, 如 1, 2, 3, ... -1, -1 表示结束
+ *  @param timevalue  消息时间
+ *  @param content    消息内容
+ *  @param extContent 消息扩展内容
+ *  @param error      如收消息出错, 则返回错误信息
+ */
+- (void)onRecvVoice:(WChatSDK *)instance
+      withMessageId:(NSString *)messageId
+            fromUid:(NSString *)fromUid
+              toUid:(NSString *)toUid
+             spanId:(NSString *)spanId
+         sequenceNo:(NSInteger)sequenceNo
+               time:(NSInteger)timevalue
+            content:(NSData *)content
+            extBody:(NSData *)extContent
+          withError:(NSError *)error;
+
+/**
+ *  @brief 接收群组语音消息回调
+ *
+ *  @param instance   实例
+ *  @param messageId  消息id
+ *  @param gid        群id
+ *  @param fromUid    发消息人Uid
+ *  @param spanId     语音唯一标识
+ *  @param sequenceNo 语音分片编号, 如 1, 2, 3, ... -1, -1 表示结束
+ *  @param timevalue  消息时间
+ *  @param content    消息内容
+ *  @param extContent 消息扩展内容
+ *  @param error      如收消息出错, 则返回错误信息
+ */
+- (void)onRecvGroupVoice:(WChatSDK *)instance
+           withMessageId:(NSString *)messageId
+             withGroupId:(NSString *)gid
+                 fromUid:(NSString *)fromUid
+                  spanId:(NSString *)spanId
+              sequenceNo:(NSInteger)sequenceNo
+                    time:(NSInteger)timevalue
+                 content:(NSData *)content
+                 extBody:(NSData *)extContent
+               withError:(NSError *)error;
+```
 
 
 #### 6.接收文件、图片
 
-	/**
-	 *  @brief 接收文件消息回调
-	 *
-	 *  @param instance      实例
-	 *  @param messageId     消息id
-	 *  @param fromUid       发消息人Uid
-	 *  @param toUid         收消息人Uid
-	 *  @param type          消息类型
-	 *  @param timevalue     消息时间
-	 *  @param fileid        文件id
-	 *  @param thumbnailData 缩略图二进制数据
-	 *  @param extContent    消息扩展内容
-	 *  @param length        文件长度
-	 *  @param size          文件分片大小
-	 *  @param error         如收文件出错, 则返回错误信息
-	 */
-	- (void)onRecvFile:(WChatSDK *)instance
-	     withMessageId:(NSString *)messageId
-	           fromUid:(NSString *)fromUid
-	             toUid:(NSString *)toUid
-	          filetype:(YYWChatFileType)type
-	              time:(NSInteger)timevalue
-	            fileId:(NSString *)fileid
-	         thumbnail:(NSData *)thumbnailData
-	           extBody:(NSData *)extContent
-	        filelength:(UInt64)length
-	         pieceSize:(UInt32)size
-	         withError:(NSError *)error;
-	
-	/**
-	 *  @brief 接收群组文件消息回调
-	 *
-	 *  @param instance      实例
-	 *  @param messageId     消息id
-	 *  @param gid           群id
-	 *  @param fromUid       发消息人Uid
-	 *  @param type          消息类型
-	 *  @param timevalue     消息时间
-	 *  @param fileid        文件id
-	 *  @param thumbnailData 缩略图二进制数据
-	 *  @param extContent    消息扩展内容
-	 *  @param length        文件长度
-	 *  @param size          文件分片大小
-	 *  @param error         如收文件出错, 则返回错误信息
-	 */
-	- (void)onRecvGroupFile:(WChatSDK *)instance
-	          withMessageId:(NSString *)messageId
-	            withGroupId:(NSString *)gid
-	                fromUid:(NSString *)fromUid
-	               filetype:(YYWChatFileType)type
-	                   time:(NSInteger)timevalue
-	                 fileId:(NSString *)fileid
-	              thumbnail:(NSData *)thumbnailData
-	                extBody:(NSData *)extContent
-	             filelength:(UInt64)length
-	              pieceSize:(UInt32)size
-	              withError:(NSError *)error;
+```objective-c
+/**
+ *  @brief 接收文件消息回调
+ *
+ *  @param instance      实例
+ *  @param messageId     消息id
+ *  @param fromUid       发消息人Uid
+ *  @param toUid         收消息人Uid
+ *  @param type          消息类型
+ *  @param timevalue     消息时间
+ *  @param fileid        文件id
+ *  @param thumbnailData 缩略图二进制数据
+ *  @param extContent    消息扩展内容
+ *  @param length        文件长度
+ *  @param size          文件分片大小
+ *  @param error         如收文件出错, 则返回错误信息
+ */
+- (void)onRecvFile:(WChatSDK *)instance
+     withMessageId:(NSString *)messageId
+           fromUid:(NSString *)fromUid
+             toUid:(NSString *)toUid
+          filetype:(YYWChatFileType)type
+              time:(NSInteger)timevalue
+            fileId:(NSString *)fileid
+         thumbnail:(NSData *)thumbnailData
+           extBody:(NSData *)extContent
+        filelength:(UInt64)length
+         pieceSize:(UInt32)size
+         withError:(NSError *)error;
+
+/**
+ *  @brief 接收群组文件消息回调
+ *
+ *  @param instance      实例
+ *  @param messageId     消息id
+ *  @param gid           群id
+ *  @param fromUid       发消息人Uid
+ *  @param type          消息类型
+ *  @param timevalue     消息时间
+ *  @param fileid        文件id
+ *  @param thumbnailData 缩略图二进制数据
+ *  @param extContent    消息扩展内容
+ *  @param length        文件长度
+ *  @param size          文件分片大小
+ *  @param error         如收文件出错, 则返回错误信息
+ */
+- (void)onRecvGroupFile:(WChatSDK *)instance
+          withMessageId:(NSString *)messageId
+            withGroupId:(NSString *)gid
+                fromUid:(NSString *)fromUid
+               filetype:(YYWChatFileType)type
+                   time:(NSInteger)timevalue
+                 fileId:(NSString *)fileid
+              thumbnail:(NSData *)thumbnailData
+                extBody:(NSData *)extContent
+             filelength:(UInt64)length
+              pieceSize:(UInt32)size
+              withError:(NSError *)error;
+```
 
 #### 7.接收notice、订阅
 
-	/**
-	 *  @brief 系统下发的notice消息, 踢人回调
-	 *
-	 *  @param instance 实例
-	 *  @param fuid     发消息人Uid
-	 *  @param type     Notice类型
-	 *  @param content  消息内容
-	 */
-	- (void)onRecvNoticeMessage:(WChatSDK *)instance
-	                    fromUid:(NSString *)fuid
-	                   withType:(WChatNoticeType)type
-	                withContent:(NSString *)content;
-	
-	/**
-	 *  @brief 订阅消息回调
-	 *
-	 *  @param instance      实例
-	 *  @param messageId     消息id
-	 *  @param fromUid       发消息人Uid
-	 *  @param toUid         收消息人Uid
-	 *  @param type          消息类型
-	 *  @param spanId        语音唯一标识
-	 *  @param sequenceNo    语音分片编号, 如 1, 2, 3, ... -1, -1 表示结束
-	 *  @param fileid        文件id
-	 *  @param thumbnailData 缩略图二进制数据
-	 *  @param length        文件长度
-	 *  @param size          分片大小
-	 *  @param timevalue     消息时间
-	 *  @param content       消息内容
-	 *  @param extContent    消息扩展内容
-	 *  @param error         如收消息出错, 则返回错误信息
-	 */
-	- (void)onRecvSubscribeMsg:(WChatSDK *)instance
-	             withMessageId:(NSString *)messageId
-	                   fromUid:(NSString *)fromUid
-	                     toUid:(NSString *)toUid
-	                  filetype:(YYWChatFileType)type
-	                    spanId:(NSString *)spanId
-	                sequenceNo:(NSInteger)sequenceNo
-	                    fileId:(NSString *)fileid
-	                 thumbnail:(NSData *)thumbnailData
-	                filelength:(UInt64)length
-	                 pieceSize:(UInt32)size
-	                      time:(NSInteger)timevalue
-	                   content:(NSData *)content
-	                   extBody:(NSData *)extContent
-	                 withError:(NSError *)error;
+```objective-c
+/**
+ *  @brief 系统下发的notice消息, 踢人回调
+ *
+ *  @param instance 实例
+ *  @param fuid     发消息人Uid
+ *  @param type     Notice类型
+ *  @param content  消息内容
+ */
+- (void)onRecvNoticeMessage:(WChatSDK *)instance
+                    fromUid:(NSString *)fuid
+                   withType:(WChatNoticeType)type
+                withContent:(NSString *)content;
+
+/**
+ *  @brief 订阅消息回调
+ *
+ *  @param instance      实例
+ *  @param messageId     消息id
+ *  @param fromUid       发消息人Uid
+ *  @param toUid         收消息人Uid
+ *  @param type          消息类型
+ *  @param spanId        语音唯一标识
+ *  @param sequenceNo    语音分片编号, 如 1, 2, 3, ... -1, -1 表示结束
+ *  @param fileid        文件id
+ *  @param thumbnailData 缩略图二进制数据
+ *  @param length        文件长度
+ *  @param size          分片大小
+ *  @param timevalue     消息时间
+ *  @param content       消息内容
+ *  @param extContent    消息扩展内容
+ *  @param error         如收消息出错, 则返回错误信息
+ */
+- (void)onRecvSubscribeMsg:(WChatSDK *)instance
+             withMessageId:(NSString *)messageId
+                   fromUid:(NSString *)fromUid
+                     toUid:(NSString *)toUid
+                  filetype:(YYWChatFileType)type
+                    spanId:(NSString *)spanId
+                sequenceNo:(NSInteger)sequenceNo
+                    fileId:(NSString *)fileid
+                 thumbnail:(NSData *)thumbnailData
+                filelength:(UInt64)length
+                 pieceSize:(UInt32)size
+                      time:(NSInteger)timevalue
+                   content:(NSData *)content
+                   extBody:(NSData *)extContent
+                 withError:(NSError *)error;
+```
 
 #### 8.接收聊天室消息
 
-	/**
-	 *  @brief 接收聊天室消息回调
-	 *
-	 *  @param instance      实例
-	 *  @param messageId     消息id
-	 *  @param rid           房间id
-	 *  @param fromUid       发消息人Uid
-	 *  @param type          消息类型
-	 *  @param spanId        语音唯一标识
-	 *  @param sequenceNo    语音分片编号, 如 1, 2, 3, ... -1, -1 表示结束
-	 *  @param fileid        文件id
-	 *  @param thumbnailData 缩略图二进制数据
-	 *  @param length        文件长度
-	 *  @param size          分片大小
-	 *  @param timevalue     消息时间
-	 *  @param content       消息内容
-	 *  @param extContent    消息扩展内容
-	 *  @param error         如收消息出错, 则返回错误信息
-	 */
-	- (void)onRecvChatRoomMsg:(WChatSDK *)instance
-	            withMessageId:(NSString *)messageId
-	               withRoomId:(NSString *)rid
-	                  fromUid:(NSString *)fromUid
-	                 filetype:(YYWChatFileType)type
-	                   spanId:(NSString *)spanId
-	               sequenceNo:(NSInteger)sequenceNo
-	                   fileId:(NSString *)fileid
-	                thumbnail:(NSData *)thumbnailData
-	               filelength:(UInt64)length
-	                pieceSize:(UInt32)size
-	                     time:(NSInteger)timevalue
-	                  content:(NSData *)content
-	                  extBody:(NSData *)extContent
-	                withError:(NSError *)error;
+```objective-c
+/**
+ *  @brief 接收聊天室消息回调
+ *
+ *  @param instance      实例
+ *  @param messageId     消息id
+ *  @param rid           房间id
+ *  @param fromUid       发消息人Uid
+ *  @param type          消息类型
+ *  @param spanId        语音唯一标识
+ *  @param sequenceNo    语音分片编号, 如 1, 2, 3, ... -1, -1 表示结束
+ *  @param fileid        文件id
+ *  @param thumbnailData 缩略图二进制数据
+ *  @param length        文件长度
+ *  @param size          分片大小
+ *  @param timevalue     消息时间
+ *  @param content       消息内容
+ *  @param extContent    消息扩展内容
+ *  @param error         如收消息出错, 则返回错误信息
+ */
+- (void)onRecvChatRoomMsg:(WChatSDK *)instance
+            withMessageId:(NSString *)messageId
+               withRoomId:(NSString *)rid
+                  fromUid:(NSString *)fromUid
+                 filetype:(YYWChatFileType)type
+                   spanId:(NSString *)spanId
+               sequenceNo:(NSInteger)sequenceNo
+                   fileId:(NSString *)fileid
+                thumbnail:(NSData *)thumbnailData
+               filelength:(UInt64)length
+                pieceSize:(UInt32)size
+                     time:(NSInteger)timevalue
+                  content:(NSData *)content
+                  extBody:(NSData *)extContent
+                withError:(NSError *)error;
+```
 
 #### 9.获取文件 & 文件进度
 
-	/**
-	 *  @brief 获取文件数据回调
-	 *
-	 *  @param instance 实例
-	 *  @param fileid   文件id
-	 *  @param tag      消息标示
-	 *  @param error    如获取文件出错, 则返回错误信息
-	 */
-	- (void)onGetFile:(WChatSDK *)instance
-	           fileId:(NSString *)fileid
-	          withTag:(NSInteger)tag
-	        withError:(NSError *)error;
-	
-	/**
-	 *  @brief 发送和接收文件进度的回调
-	 *
-	 *  @param instance 实例
-	 *  @param tag      消息标示
-	 *  @param index    文件分片索引
-	 *  @param limit    文件分片总数
-	 *  @param error    如获取进度出错, 则返回错误信息
-	 */
-	- (void)onFileProgress:(WChatSDK *)instance
-	               withTag:(NSInteger)tag
-	             withIndex:(UInt32)index
-	             withLimit:(UInt32)limit
-	             withError:(NSError *)error;
+```objective-c
+/**
+ *  @brief 获取文件数据回调
+ *
+ *  @param instance 实例
+ *  @param fileid   文件id
+ *  @param tag      消息标示
+ *  @param error    如获取文件出错, 则返回错误信息
+ */
+- (void)onGetFile:(WChatSDK *)instance
+           fileId:(NSString *)fileid
+          withTag:(NSInteger)tag
+        withError:(NSError *)error;
+
+/**
+ *  @brief 发送和接收文件进度的回调
+ *
+ *  @param instance 实例
+ *  @param tag      消息标示
+ *  @param index    文件分片索引
+ *  @param limit    文件分片总数
+ *  @param error    如获取进度出错, 则返回错误信息
+ */
+- (void)onFileProgress:(WChatSDK *)instance
+               withTag:(NSInteger)tag
+             withIndex:(UInt32)index
+             withLimit:(UInt32)limit
+             withError:(NSError *)error;
+```
 
 #### 10.多人会话
 
-	/**
-	 * Called when receive conference 电话会议 房间 的 创建 和邀请 message
-	 **/
-	- (void)onReceiveConfeneceCallback:(WChatSDK *)instance
-	                              type:(cfcallbackType)type
-	                          fromUser:(NSString *)fromUid
-	                           groupID:(NSString *)groupID
-	                            roomID:(NSString *)roomID
-	                               key:(NSString *)key
-	                             users:(NSArray *)users
-	                         startTime:(NSString *)startTime
-	                           endTime:(NSString *)endTime
-	                             error:(NSError *)error;
-	
-	/**
-	 * Called when conference 电话会议 有人加入
-	 **/
-	- (void)conferenceJoinedWith:(NSString *)roomID
-	                     groupID:(NSString *)groupID
-	                       users:(NSArray *)users;
-	
-	/**
-	 * Called when conference 电话会议 有人被禁言
-	 **/
-	- (void)conferenceMutedWith:(NSString *)roomID
-	                    groupID:(NSString *)groupID
-	                    fromUid:(NSString *)fromUid
-	                      users:(NSArray *)users;
-	
-	/**
-	 * Called when conference 电话会议 有人被解禁
-	 **/
-	- (void)conferenceUnmutedWith:(NSString *)roomID
-	                      groupID:(NSString *)groupID
-	                      fromUid:(NSString *)fromUid
-	                        users:(NSArray *)users;
-	
-	/**
-	 * Called when conference 电话会议 有人被踢
-	 **/
-	- (void)conferenceKickedWith:(NSString *)roomID
-	                     groupID:(NSString *)groupID
-	                     fromUid:(NSString *)fromUid
-	                       users:(NSArray *)users;
-	
-	/**
-	 * Called when conference 电话会议 有人离开
-	 **/
-	- (void)conferenceLeftWith:(NSString *)roomID
-	                   groupID:(NSString *)groupID
-	                     users:(NSArray *)users;
-	
-	/**
-	 * Called when conference 电话会议 即将关闭的通知提示
-	 **/
-	- (void)conferenceWillbeEndWith:(NSString *)roomID
-	                        groupID:(NSString *)groupID
-	                         intime:(NSInteger )second;
-	
-	/**
-	 * Called when conference 电话会议 验证失败 房间已经过期
-	 **/
-	- (void)conferenceExpiredWithRoomID:(NSString *)roomID
-	                                key:(NSString *)key;
-	
-	/**
-	 * 未接到的来电
-	 **/
-	- (void)missCallFromUser:(NSString *)fromUid
-	                  atTime:(NSInteger)time;
-	
-	/**
-	 * Called when live 直播 主播离开
-	 * dic 中分别用 key：uid 和 roomid 来取主播的uid和直播间的id
-	 **/
-	-(void)liveHostLeaveWithUidRoomidDic:(NSDictionary *)dic;
+```objective-c
+/**
+ * Called when receive conference 电话会议 房间 的 创建 和邀请 message
+ **/
+- (void)onReceiveConfeneceCallback:(WChatSDK *)instance
+                              type:(cfcallbackType)type
+                          fromUser:(NSString *)fromUid
+                           groupID:(NSString *)groupID
+                            roomID:(NSString *)roomID
+                               key:(NSString *)key
+                             users:(NSArray *)users
+                         startTime:(NSString *)startTime
+                           endTime:(NSString *)endTime
+                             error:(NSError *)error;
+
+/**
+ * Called when conference 电话会议 有人加入
+ **/
+- (void)conferenceJoinedWith:(NSString *)roomID
+                     groupID:(NSString *)groupID
+                       users:(NSArray *)users;
+
+/**
+ * Called when conference 电话会议 有人被禁言
+ **/
+- (void)conferenceMutedWith:(NSString *)roomID
+                    groupID:(NSString *)groupID
+                    fromUid:(NSString *)fromUid
+                      users:(NSArray *)users;
+
+/**
+ * Called when conference 电话会议 有人被解禁
+ **/
+- (void)conferenceUnmutedWith:(NSString *)roomID
+                      groupID:(NSString *)groupID
+                      fromUid:(NSString *)fromUid
+                        users:(NSArray *)users;
+
+/**
+ * Called when conference 电话会议 有人被踢
+ **/
+- (void)conferenceKickedWith:(NSString *)roomID
+                     groupID:(NSString *)groupID
+                     fromUid:(NSString *)fromUid
+                       users:(NSArray *)users;
+
+/**
+ * Called when conference 电话会议 有人离开
+ **/
+- (void)conferenceLeftWith:(NSString *)roomID
+                   groupID:(NSString *)groupID
+                     users:(NSArray *)users;
+
+/**
+ * Called when conference 电话会议 即将关闭的通知提示
+ **/
+- (void)conferenceWillbeEndWith:(NSString *)roomID
+                        groupID:(NSString *)groupID
+                         intime:(NSInteger )second;
+
+/**
+ * Called when conference 电话会议 验证失败 房间已经过期
+ **/
+- (void)conferenceExpiredWithRoomID:(NSString *)roomID
+                                key:(NSString *)key;
+
+/**
+ * 未接到的来电
+ **/
+- (void)missCallFromUser:(NSString *)fromUid
+                  atTime:(NSInteger)time;
+
+/**
+ * Called when live 直播 主播离开
+ * dic 中分别用 key：uid 和 roomid 来取主播的uid和直播间的id
+ **/
+-(void)liveHostLeaveWithUidRoomidDic:(NSDictionary *)dic;
+```
 
 # 群组业务接口
 
 #### 1.群组 - 管理相关接口
 
-    /**
-     *  创建群组
-     *
-     *  @param handler 回调block (创建成功的群组id, 如果错误则返回错误信息)
-     */
-    -(void)createGroupWithCompletionHandler:(void(^)(NSString *groupId, NSError* requestError))handler;
-    
-    /**
-     *  群组加人
-     *
-     *  @param groupId 群组id
-     *  @param userId  用户id
-     *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
-     */
-    -(void)group:(NSString *)groupId addUser:(NSArray *)userIds completionHandler:(void (^)(BOOL isAdd, NSError* requestError))handler;
-    
-    /**
-     *  群组踢人
-     *
-     *  @param groupId 群组id
-     *  @param userId  用户id
-     *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
-     */
-    -(void)group:(NSString *)groupId delUser:(NSArray *)userIds completionHandler:(void (^)(BOOL isDel, NSError* requestError))handler;
-    
-    /**
-     *  退出群组
-     *
-     *  @param groupId 群组id
-     *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
-     */
-    -(void)exitGroup:(NSString *)groupId CompletionHandler:(void(^)(BOOL isExit, NSError* requestError))handler;
-    
-    /**
-     *  获取群组成员
-     *
-     *  @param groupId 群组id
-     *  @param handler 回调block (群组成员数据, 如果错误则返回错误信息)
-     */
-    -(void)getGroupUsers:(NSString *)groupId completionHandler:(void (^)(NSArray *users, NSError* requestError))handler;
-    
-    /**
-     *  获取当前用户的群组
-     *
-     *  @param handler 回调block (用户的群组数据, 如果错误则返回错误信息)
-     */
-    -(void)getUserGroupsWithCompletionHandler:(void (^)(NSArray *groups, NSError* requestError))handler;
+```objective-c
+/**
+ *  创建群组
+ *
+ *  @param handler 回调block (创建成功的群组id, 如果错误则返回错误信息)
+ */
+-(void)createGroupWithCompletionHandler:(void(^)(NSString *groupId, NSError* requestError))handler;
+
+/**
+ *  群组加人
+ *
+ *  @param groupId 群组id
+ *  @param userId  用户id
+ *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
+ */
+-(void)group:(NSString *)groupId addUser:(NSArray *)userIds completionHandler:(void (^)(BOOL isAdd, NSError* requestError))handler;
+
+/**
+ *  群组踢人
+ *
+ *  @param groupId 群组id
+ *  @param userId  用户id
+ *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
+ */
+-(void)group:(NSString *)groupId delUser:(NSArray *)userIds completionHandler:(void (^)(BOOL isDel, NSError* requestError))handler;
+
+/**
+ *  退出群组
+ *
+ *  @param groupId 群组id
+ *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
+ */
+-(void)exitGroup:(NSString *)groupId CompletionHandler:(void(^)(BOOL isExit, NSError* requestError))handler;
+
+/**
+ *  获取群组成员
+ *
+ *  @param groupId 群组id
+ *  @param handler 回调block (群组成员数据, 如果错误则返回错误信息)
+ */
+-(void)getGroupUsers:(NSString *)groupId completionHandler:(void (^)(NSArray *users, NSError* requestError))handler;
+
+/**
+ *  获取当前用户的群组
+ *
+ *  @param handler 回调block (用户的群组数据, 如果错误则返回错误信息)
+ */
+-(void)getUserGroupsWithCompletionHandler:(void (^)(NSArray *groups, NSError* requestError))handler;
+
+/**
+ * 更新群设置信息
+ *
+ * @param gid   群组ID
+ * @param needsApply    新成员加入审核:yes 需要审核，no 不需要
+ * @param approveMode   成员加入审核方式
+ * @param inviteMode    邀请权限：1 成员可邀请，2 vip之上成员可邀请，3 管理员之上成员可邀请，4 创建者可邀请
+ * @param chatMode      发言权限：1 成员可发言，2 vip之上成员可发言，3 管理员之上成员可发言，4 创建者可发言
+ * @param members       成员可见性：0 所有人可见，1 成员可见，2 vip之上成员可见，3 管理员之上成员可见，4 创建者可见
+ * @param info          群资料可见性：0 所有人可见，1 成员可见，2 vip之上成员可见，3 管理员之上成员可见，4 创建者可见
+ * @param authed        群是否认证通过:yes 通过，no 不通过
+ * @param updateRole    资料编辑权限：3 管理员，4 创建者.权限大于设置就可以进行对应的操作
+ * @param setRole       可以设置禁言的权限,3 管理员，4 创建者.权限大于设置就可以进行对应的操作
+ *
+ **/
+- (void)group:(NSString *)gid updateSettingsApply:(BOOL)needsApplay approveMode:(YYGroupApproveType)approveMode inviteMode:(YYGroupUserRoleType)inviteMode chatMode:(YYGroupUserRoleType)chatMode memberMode:(YYGroupUserRoleType)memberMode info:(YYGroupUserRoleType)info authed:(BOOL)authed updateRole:(YYGroupUserRoleType)updateRole setRole:(YYGroupUserRoleType)setRole completion:(void (^)(NSDictionary *result, NSError *err))handler;
+
+/**
+ 设置群成员的角色
+
+ @param gid     群组ID
+ @param role    要设置的角色枚举类型
+ @param uid     群成员ID
+ @param handler 回调
+ */
+- (void)group:(NSString *)gid setRole:(YYGroupUserRoleType)role destinotionUid:(NSString *)uid conpletion:(void (^)(BOOL success, NSError * err))handler;
+
+/**
+ 禁言／解除禁言群组内的一个或多个成员
+
+ @param gid     群组ID
+ @param uids    要禁言／解除禁言的群成员ID
+ @param isLimit YES：禁言／NO：解除禁言
+ @param time    禁言时间(默认15分钟)
+ @param handler 回调
+ */
+- (void)group:(NSString *)gid limitUids:(NSArray *)uids isLimit:(BOOL)isLimit times:(NSInteger)time completion:(void (^)(NSArray *limitedUid, NSError *err))handler;
+
+/**
+ 设置群组的扩展信息
+
+ @param gid         群组ID
+ @param uid         要设置信息的用户ID
+ @param alias   群名称（非必要）
+ @param remind      下发消息类型
+ @param handler     回调
+ */
+- (void)group:(NSString *)gid updateUid:(NSString *)uid alias:(NSString *)alias msgRemind:(YYGroupMsgRemindType)remind completion:(void (^)(BOOL success, NSError *err))handler;
+
+/**
+ 获取群组内被禁言的成员ID
+
+ @param gid     群组ID
+ @param handler 回调
+ */
+- (void)group:(NSString *)gid getLimitsUidsCompletion:(void (^)(NSArray *uids, NSError *err))handler;
+```
 
 #### 2.黑名单相关接口
 
-    /**
-     *  黑名单添加用户.
-     *
-     *  @param userId  聊天对方uid(非当前登陆用户)
-     *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
-     */
-    -(void)blacklistAddUser:(NSString *)userId completionHandler:(void (^)(BOOL isAdd, NSError* requestError))handler;
-    
-    /**
-     *  黑名单删除用户.
-     *
-     *  @param userId  聊天对方uid(非当前登陆用户)
-     *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
-     */
-    -(void)blacklistDelUser:(NSString *)userId completionHandler:(void (^)(BOOL isDel, NSError* requestError))handler;
-    
-    /**
-     *  当前用户黑名单
-     *
-     *  @param handler 回调block (黑名单数据, 如果错误则返回错误信息)
-     */
-    -(void)blacklistWithCompletionHandler:(void (^)(NSArray *blacklist, NSError* requestError))handler;
+```objective-c
+/**
+ *  黑名单添加用户.
+ *
+ *  @param userId  聊天对方uid(非当前登陆用户)
+ *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
+ */
+-(void)blacklistAddUser:(NSString *)userId completionHandler:(void (^)(BOOL isAdd, NSError* requestError))handler;
+
+/**
+ *  黑名单删除用户.
+ *
+ *  @param userId  聊天对方uid(非当前登陆用户)
+ *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
+ */
+-(void)blacklistDelUser:(NSString *)userId completionHandler:(void (^)(BOOL isDel, NSError* requestError))handler;
+
+/**
+ *  当前用户黑名单
+ *
+ *  @param handler 回调block (黑名单数据, 如果错误则返回错误信息)
+ */
+-(void)blacklistWithCompletionHandler:(void (^)(NSArray *blacklist, NSError* requestError))handler;
+```
 
 #### 3.消息相关接口
 
-    /**
-     *  单聊聊天历史消息.
-     *
-     *  @param userId    聊天对方uid(非当前登陆用户)
-     *  @param timestamp 时间戳(精确到秒)
-     *  @param size      数据条数(服务器默认一次最多取20)
-     *  @param handler   回调block (历史消息数据, 如果错误则返回错误信息)
-     */
-    -(void)getHistoryByUser:(NSString *)userId timestamp:(NSInteger)timestamp size:(NSInteger)size completionHandler:(void (^)(NSArray *history, NSError* requestError))handler;
-    
-    /**
-     *  群聊聊天历史消息
-     *
-     *  @param groupId   群组id
-     *  @param timestamp 时间戳(精确到秒)
-     *  @param size      数据条数(服务器默认一次最多取20)
-     *  @param handler   回调block (历史消息数据, 如果错误则返回错误信息)
-     */
-    -(void)getHistoryByGroup:(NSString *)groupId timestamp:(NSInteger)timestamp size:(NSInteger)size completionHandler:(void (^)(NSArray *, NSError *))handler;
+```objective-c
+/**
+ *  单聊聊天历史消息.
+ *
+ *  @param userId    聊天对方uid(非当前登陆用户)
+ *  @param timestamp 时间戳(精确到秒)
+ *  @param size      数据条数(服务器默认一次最多取20)
+ *  @param handler   回调block (历史消息数据, 如果错误则返回错误信息)
+ */
+-(void)getHistoryByUser:(NSString *)userId timestamp:(NSInteger)timestamp size:(NSInteger)size completionHandler:(void (^)(NSArray *history, NSError* requestError))handler;
+
+/**
+ *  群聊聊天历史消息
+ *
+ *  @param groupId   群组id
+ *  @param timestamp 时间戳(精确到秒)
+ *  @param size      数据条数(服务器默认一次最多取20)
+ *  @param handler   回调block (历史消息数据, 如果错误则返回错误信息)
+ */
+-(void)getHistoryByGroup:(NSString *)groupId timestamp:(NSInteger)timestamp size:(NSInteger)size completionHandler:(void (^)(NSArray *, NSError *))handler;
+```
 
 #### 4.服务相关接口
 
-    /**
-     *  当前设备注册推送. 默认全天推送
-     *
-     *  @param pushToken ios注册的推送token
-     *  @param handler   回调block (是否操作成功, 如果错误则返回错误信息)
-     */
-    -(void)deviceRegisterPush:(NSString *)pushToken completionHandler:(void (^)(BOOL isRegister, NSError* requestError))handler;
-    
-    /**
-     *  当前设备注册推送. push时段
-     *
-     *  @param pushToken ios注册的推送token
-     *  @param startTime push时段开始时间(0~24),默认0,  如: 开始时间为9,  结束时间为20, push时段从当天9 点到 当天  20点.
-     *  @param endTime   push时段结束时间(0~24),默认24, 如: 开始时间为20, 结束时间为9,  push时段从当天20点到 第二天 9点.
-     *  @param handler   回调block (是否操作成功, 如果错误则返回错误信息)
-     */
-    -(void)deviceRegisterPush:(NSString *)pushToken pushStartTime:(NSInteger)startTime endTime:(NSInteger)endTime completionHandler:(void (^)(BOOL isRegister, NSError* requestError))handler;
-    
-    /**
-     *  获取设备信息.
-     *
-     *  @param handler 回调block (设备信息注册信息, 如果错误则返回错误信息)
-     */
-    -(void)deviceInfoWithCompletionHandler:(void (^)(NSDictionary *deviceInfo, NSError* requestError))handler;
+```objective-c
+/**
+ *  当前设备注册推送. 默认全天推送
+ *
+ *  @param pushToken ios注册的推送token
+ *  @param handler   回调block (是否操作成功, 如果错误则返回错误信息)
+ */
+-(void)deviceRegisterPush:(NSString *)pushToken completionHandler:(void (^)(BOOL isRegister, NSError* requestError))handler;
+
+/**
+ *  当前设备注册推送. push时段
+ *
+ *  @param pushToken ios注册的推送token
+ *  @param startTime push时段开始时间(0~24),默认0,  如: 开始时间为9,  结束时间为20, push时段从当天9 点到 当天  20点.
+ *  @param endTime   push时段结束时间(0~24),默认24, 如: 开始时间为20, 结束时间为9,  push时段从当天20点到 第二天 9点.
+ *  @param handler   回调block (是否操作成功, 如果错误则返回错误信息)
+ */
+-(void)deviceRegisterPush:(NSString *)pushToken pushStartTime:(NSInteger)startTime endTime:(NSInteger)endTime completionHandler:(void (^)(BOOL isRegister, NSError* requestError))handler;
+
+/**
+ *  获取设备信息.
+ *
+ *  @param handler 回调block (设备信息注册信息, 如果错误则返回错误信息)
+ */
+-(void)deviceInfoWithCompletionHandler:(void (^)(NSDictionary *deviceInfo, NSError* requestError))handler;
+```
 
 
 # 聊天室业务接口
 
-	/**
-	 *  创建聊天室群租
-	 *
-	 *  @param name    聊天室、群组名称
-	 *  @param cat     群组类别
-	 *  @param handler 回调结果
-	 */
-	- (void)chatRoomCreateName:(NSString *)name
-	                  categary:(WChatGroupCategary)cat
-	                completion:(void (^)(NSDictionary *response, NSError *err))handler;
-	/**
-	 *  删除聊天室房间
-	 *
-	 *  @param roomid  聊天室房间ID
-	 *  @param handler 回调个结果
-	 */
-	- (void)chatRoomDelete:(NSString *)roomid
-	            completion:(void (^)(BOOL success, NSError *err))handler;
-	
-	/**
-	 *  进入聊天室房间
-	 *
-	 *  @param roomid  聊天室房间ID
-	 *  @param alias   别名(接入方的用户ID，用来和游云ID做映射)
-	 *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
-	 */
-	- (void)chatRoomEnter:(NSString *)roomid
-	              aliasid:(NSString *)alias
-	           completion:(void(^)(BOOL isEnter, NSError *err))handler;
+```objective-c
+/**
+ *  创建聊天室群租
+ *
+ *  @param name    聊天室、群组名称
+ *  @param cat     群组类别
+ *  @param handler 回调结果
+ */
+- (void)chatRoomCreateName:(NSString *)name
+                  categary:(WChatGroupCategary)cat
+                completion:(void (^)(NSDictionary *response, NSError *err))handler;
+/**
+ *  删除聊天室房间
+ *
+ *  @param roomid  聊天室房间ID
+ *  @param handler 回调个结果
+ */
+- (void)chatRoomDelete:(NSString *)roomid
+            completion:(void (^)(BOOL success, NSError *err))handler;
 
+/**
+ *  进入聊天室房间
+ *
+ *  @param roomid  聊天室房间ID
+ *  @param alias   别名(接入方的用户ID，用来和游云ID做映射)
+ *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
+ */
+- (void)chatRoomEnter:(NSString *)roomid
+              aliasid:(NSString *)alias
+           completion:(void(^)(BOOL isEnter, NSError *err))handler;
 
-	/**
-	 *  退出聊天室房间
-	 *
-	 *  @param roomid  聊天室房间ID
-	 *  @param alias   别名(接入方的用户ID，用来和游云ID做映射)
-	 *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
-	 */
-	- (void)chatRoomExit:(NSString *)roomid 
-	             aliasid:(NSString *)alias
-	          completion:(void(^)(BOOL isExit, NSError *err))handler;
-	
-	/**
-	 *  查询聊天室成员列表
-	 *
-	 *  @param roomid  聊天室房间ID
-	 *  @param handler 回调结果
-	 */
-	- (void)chatRoomGetMembers:(NSString *)roomid
-	                completion:(void (^)(NSDictionary *response, NSError *err))handler;
-	
-	/**
-	 *  查询某用户是否在聊天室房间内
-	 *
-	 *  @param uid     游云成员ID
-	 *  @param roomid  聊天室房间ID
-	 *  @param handler 回调结果
-	 */
-	- (void)chatRoomCheckUser:(NSString *)uid
-	                   roomid:(NSString *)roomid
-	               completion:(void (^)(BOOL success, NSError *err))handler;
-	
-	/**
-	 *  禁言/解禁某聊天室内某成员
-	 *
-	 *  @param uids      游云成员ID列表
-	 *  @param roomid    聊天室房间ID
-	 *  @param isForbid  1：禁言，0：解禁言
-	 *  @param handler   回调结果
-	 */
-	- (void)chatRoomForbidUser:(NSArray *)uids
-	                    roomid:(NSString *)roomid
-	                    forbid:(int)isForbid
-	                completion:(void (^)(BOOL success, NSError *err))handler;
-	                
-	/**
-	 *  聊天室聊天历史消息
-	 *
-	 *  @param roomid    群组id
-	 *  @param timestamp 时间戳(精确到秒,如果传-1，获取最新消息)
-	 *  @param size      数据条数(服务器默认一次最多取20)
-	 *  @param handler   回调block (历史消息数据, 如果错误则返回错误信息)
-	 *					  结果倒叙(新消息arr[0],就消息arr[1])
-	 */
-	-(void)chatRoomGetHistory:(NSString *)roomid
-	                timestamp:(NSInteger)timestamp
-	                     size:(NSInteger)size
-	        completionHandler:(void (^)(NSArray *response, NSError *err))handler;
+/**
+ *  退出聊天室房间
+ *
+ *  @param roomid  聊天室房间ID
+ *  @param alias   别名(接入方的用户ID，用来和游云ID做映射)
+ *  @param handler 回调block (是否操作成功, 如果错误则返回错误信息)
+ */
+- (void)chatRoomExit:(NSString *)roomid 
+             aliasid:(NSString *)alias
+          completion:(void(^)(BOOL isExit, NSError *err))handler;
+
+/**
+ *  查询聊天室成员列表
+ *
+ *  @param roomid  聊天室房间ID
+ *  @param handler 回调结果
+ */
+- (void)chatRoomGetMembers:(NSString *)roomid
+                completion:(void (^)(NSDictionary *response, NSError *err))handler;
+
+/**
+ *  查询某用户是否在聊天室房间内
+ *
+ *  @param uid     游云成员ID
+ *  @param roomid  聊天室房间ID
+ *  @param handler 回调结果
+ */
+- (void)chatRoomCheckUser:(NSString *)uid
+                   roomid:(NSString *)roomid
+               completion:(void (^)(BOOL success, NSError *err))handler;
+
+/**
+ *  禁言/解禁某聊天室内某成员
+ *
+ *  @param uids      游云成员ID列表
+ *  @param roomid    聊天室房间ID
+ *  @param isForbid  1：禁言，0：解禁言
+ *  @param handler   回调结果
+ */
+- (void)chatRoomForbidUser:(NSArray *)uids
+                    roomid:(NSString *)roomid
+                    forbid:(int)isForbid
+                completion:(void (^)(BOOL success, NSError *err))handler;
+                
+/**
+ *  聊天室聊天历史消息
+ *
+ *  @param roomid    群组id
+ *  @param timestamp 时间戳(精确到秒,如果传-1，获取最新消息)
+ *  @param size      数据条数(服务器默认一次最多取20)
+ *  @param handler   回调block (历史消息数据, 如果错误则返回错误信息)
+ *					  结果倒叙(新消息arr[0],就消息arr[1])
+ */
+-(void)chatRoomGetHistory:(NSString *)roomid
+                timestamp:(NSInteger)timestamp
+                     size:(NSInteger)size
+        completionHandler:(void (^)(NSArray *response, NSError *err))handler;
+```
